@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My筋トレナビ</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --primary-color: #3b82f6;
+            --success-color: #10b981;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .group-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: white;
+            font-size: 1.1rem;
+            background-color: var(--primary-color);
+        }
+
+        .workout-list {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+
+        .workout-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: var(--bg-color);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        /* 完了時のスタイル */
+        .workout-item.completed {
+            border-color: var(--success-color);
+            opacity: 0.6;
+        }
+
+        .workout-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .workout-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .workout-target {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        /* チェックマークのアイコン */
+        .status-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .completed .status-icon {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .completed .status-icon::after {
+            content: "✓";
+        }
+
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            background-color: var(--text-color);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .action-btn:active {
+            background-color: #000;
+        }
+    </style>
+<link rel="manifest" href="manifest.json">
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('Service Worker Registered'));
+        }
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>今日のトレーニング</h1>
+        <div id="groupBadge" class="group-badge">Aグループ</div>
+    </header>
+
+    <ul id="workoutList" class="workout-list">
+        </ul>
+
+    <button id="finishBtn" class="action-btn">今日のトレーニングを終了</button>
+</div>
+
+<script>
+    // 1. トレーニングメニューの初期データ
+    const menus = {
+        A: [
+            { name: "スクワット", target: "大腿四頭筋・お尻" },
+            { name: "レッグプレス", target: "太もも全体" },
+            { name: "レッグカール", target: "もも裏" },
+            { name: "カーフレイズ", target: "ふくらはぎ" }
+        ],
+        B: [
+            { name: "ベンチプレス", target: "胸・三頭筋" },
+            { name: "ラットプルダウン", target: "背中・二頭筋" },
+            { name: "ショルダープレス", target: "肩" },
+            { name: "腹筋（クランチ）", target: "お腹" }
+        ]
+    };
+
+    // アプリの状態を管理する変数
+    let currentGroup = "A";
+    let completedIndexes = [];
+
+    // 各要素の取得
+    const groupBadge = document.getElementById("groupBadge");
+    const workoutList = document.getElementById("workoutList");
+    const finishBtn = document.getElementById("finishBtn");
+
+    // 2. アプリ起動時の初期化処理
+    function initApp() {
+        // LocalStorageから次やるべきグループを読み込み（なければA）
+        const savedGroup = localStorage.getItem("next_group");
+        if (savedGroup === "A" || savedGroup === "B") {
+            currentGroup = savedGroup;
+        } else {
+            currentGroup = "A";
+        }
+        
+        completedIndexes = [];
+        renderMenu();
+    }
+
+    // 3. 画面の描画処理
+    function renderMenu() {
+        // ヘッダーのバッジを更新
+        groupBadge.textContent = `${currentGroup}グループ (${currentGroup === 'A' ? '下半身' : '上半身'})`;
+        groupBadge.style.backgroundColor = currentGroup === 'A' ? '#3b82f6' : '#ec4899'; // Aは青、Bはピンク
+
+        // リストをクリアして再構築
+        workoutList.innerHTML = "";
+        const currentMenu = menus[currentGroup];
+
+        currentMenu.forEach((item, index) => {
+            const li = document.createElement("li");
+            li.className = "workout-item";
+            
+            // すでに完了している場合のスタイル適用
+            if (completedIndexes.includes(index)) {
+                li.classList.add("completed");
+            }
+
+            li.innerHTML = `
+                <div class="workout-info">
+                    <span class="workout-name">${item.name}</span>
+                    <span class="workout-target">${item.target}</span>
+                </div>
+                <div class="status-icon"></div>
+            `;
+
+            // タップしたときの完了・未完了切り替えイベント
+            li.addEventListener("click", () => toggleComplete(index));
+            workoutList.appendChild(li);
+        });
+    }
+
+    // 4. 種目の完了状態を切り替える関数
+    function toggleComplete(index) {
+        const itemIdx = completedIndexes.indexOf(index);
+        if (itemIdx > -1) {
+            // すでに完了してたら未完了に戻す
+            completedIndexes.splice(itemIdx, 1);
+        } else {
+            // 未完了なら完了リストに追加
+            completedIndexes.push(index);
+        }
+        renderMenu();
+    }
+
+    // 5. 「終了」ボタンを押したときの処理
+    finishBtn.addEventListener("click", () => {
+        // 次のグループを決定
+        const nextGroup = currentGroup === "A" ? "B" : "A";
+        
+        // LocalStorageに保存
+        localStorage.setItem("next_group", nextGroup);
+        
+        // 状態を更新して再描画
+        currentGroup = nextGroup;
+        completedIndexes = [];
+        renderMenu();
+        
+        // スマホの上部にスクロールを戻す
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        alert(`お疲れ様でした！次回は ${nextGroup}グループ です。`);
+    });
+
+    // アプリ起動
+    initApp();
+</script>
+
+</body>
+</html>
