@@ -65,7 +65,7 @@
         .workout-list {
             list-style: none;
             margin-bottom: 24px;
-            min-height: 50px; /* 全消えした時のための余白 */
+            min-height: 50px;
         }
 
         .workout-item {
@@ -82,7 +82,6 @@
             animation: fadeIn 0.3s ease;
         }
 
-        /* 完了した種目は非表示にする（アニメーション用に縮小して消す） */
         .workout-item.completed {
             display: none;
         }
@@ -123,14 +122,27 @@
             flex-shrink: 0;
         }
 
-        /* 全コンプリート時のメッセージ用スタイル */
-        .complete-message {
+        /* 全コンプリート時のメッセージと画像のスタイル */
+        .complete-container {
             text-align: center;
-            padding: 30px 10px;
+            padding: 20px 10px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .complete-message {
             color: var(--success-color);
             font-weight: bold;
-            font-size: 1.2rem;
-            animation: fadeIn 0.3s ease;
+            font-size: 1.4rem;
+            margin-bottom: 16px;
+        }
+
+        .complete-image {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            margin-bottom: 16px;
         }
 
         .action-btn {
@@ -195,6 +207,13 @@
         ]
     };
 
+    // 送っていただいた3枚の画像名に書き換えました
+    const successImages = [
+        "20260524_112835.webp",
+        "20260706_115609.webp",
+        "20251210_145403.webp"
+    ];
+
     let currentGroup = "A";
     let completedIndexes = [];
 
@@ -215,7 +234,6 @@
     }
 
     function renderMenu() {
-        // ヘッダーのバッジと色の更新 (A: ピンク / B: 青)
         groupBadge.textContent = `${currentGroup}グループ (${currentGroup === 'A' ? '上半身' : '下半身'})`;
         groupBadge.style.backgroundColor = currentGroup === 'A' ? '#ec4899' : '#3b82f6';
 
@@ -224,12 +242,21 @@
 
         // すべてのメニューが完了したかチェック
         if (completedIndexes.length === currentMenu.length) {
-            workoutList.innerHTML = `<div class="complete-message">🎉 今日のメニュー全達成！ 🎉</div>`;
+            // ランダムで画像を1枚選ぶ
+            const randomIndex = Math.floor(Math.random() * successImages.length);
+            const selectedImage = successImages[randomIndex];
+
+            // 達成メッセージと画像を表示
+            workoutList.innerHTML = `
+                <div class="complete-container">
+                    <div class="complete-message">🎉 今日のメニュー全達成！ 🎉</div>
+                    <img src="${selectedImage}" class="complete-image" alt="ご褒美画像">
+                </div>
+            `;
             return;
         }
 
         currentMenu.forEach((item, index) => {
-            // 完了しているインデックスの種目は描画スキップ（非表示）
             if (completedIndexes.includes(index)) {
                 return;
             }
@@ -245,7 +272,6 @@
                 <div class="status-icon"></div>
             `;
 
-            // タップされたら完了にして非表示にする
             li.addEventListener("click", () => {
                 completedIndexes.push(index);
                 renderMenu();
@@ -262,7 +288,7 @@
         localStorage.setItem("next_group", nextGroup);
         
         currentGroup = nextGroup;
-        completedIndexes = []; // チェック状態をリセット
+        completedIndexes = [];
         renderMenu();
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
