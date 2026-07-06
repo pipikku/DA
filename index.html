@@ -9,8 +9,8 @@
             --bg-color: #f4f6f9;
             --card-bg: #ffffff;
             --text-color: #333333;
-            --primary-color: #ec4899; /* 上半身（A）のメイン色 */
-            --secondary-color: #3b82f6; /* 下半身（B）のメイン色 */
+            --primary-color: #ec4899; /* 上半身（A） */
+            --secondary-color: #3b82f6; /* 下半身（B） */
             --success-color: #10b981;
             --border-color: #e5e7eb;
         }
@@ -65,6 +65,7 @@
         .workout-list {
             list-style: none;
             margin-bottom: 24px;
+            min-height: 50px; /* 全消えした時のための余白 */
         }
 
         .workout-item {
@@ -76,14 +77,19 @@
             border-radius: 12px;
             margin-bottom: 12px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             border: 2px solid transparent;
+            animation: fadeIn 0.3s ease;
         }
 
-        /* 完了時のスタイル */
+        /* 完了した種目は非表示にする（アニメーション用に縮小して消す） */
         .workout-item.completed {
-            border-color: var(--success-color);
-            opacity: 0.4;
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .workout-info {
@@ -105,7 +111,6 @@
             line-height: 1.3;
         }
 
-        /* チェックマークのアイコン */
         .status-icon {
             width: 28px;
             height: 28px;
@@ -115,18 +120,17 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            transition: all 0.2s ease;
             flex-shrink: 0;
         }
 
-        .completed .status-icon {
-            background-color: var(--success-color);
-            border-color: var(--success-color);
-            color: white;
-        }
-
-        .completed .status-icon::after {
-            content: "✓";
+        /* 全コンプリート時のメッセージ用スタイル */
+        .complete-message {
+            text-align: center;
+            padding: 30px 10px;
+            color: var(--success-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+            animation: fadeIn 0.3s ease;
         }
 
         .action-btn {
@@ -170,7 +174,7 @@
 </div>
 
 <script>
-    // 1. アップデートされたトレーニングメニュー
+    // トレーニングメニュー
     const menus = {
         A: [
             { name: "チェストプレス", target: "40kg × 12回 / 3セット" },
@@ -218,13 +222,20 @@
         workoutList.innerHTML = "";
         const currentMenu = menus[currentGroup];
 
+        // すべてのメニューが完了したかチェック
+        if (completedIndexes.length === currentMenu.length) {
+            workoutList.innerHTML = `<div class="complete-message">🎉 今日のメニュー全達成！ 🎉</div>`;
+            return;
+        }
+
         currentMenu.forEach((item, index) => {
+            // 完了しているインデックスの種目は描画スキップ（非表示）
+            if (completedIndexes.includes(index)) {
+                return;
+            }
+
             const li = document.createElement("li");
             li.className = "workout-item";
-            
-            if (completedIndexes.includes(index)) {
-                li.classList.add("completed");
-            }
 
             li.innerHTML = `
                 <div class="workout-info">
@@ -234,19 +245,14 @@
                 <div class="status-icon"></div>
             `;
 
-            li.addEventListener("click", () => toggleComplete(index));
+            // タップされたら完了にして非表示にする
+            li.addEventListener("click", () => {
+                completedIndexes.push(index);
+                renderMenu();
+            });
+            
             workoutList.appendChild(li);
         });
-    }
-
-    function toggleComplete(index) {
-        const itemIdx = completedIndexes.indexOf(index);
-        if (itemIdx > -1) {
-            completedIndexes.splice(itemIdx, 1);
-        } else {
-            completedIndexes.push(index);
-        }
-        renderMenu();
     }
 
     finishBtn.addEventListener("click", () => {
@@ -256,7 +262,7 @@
         localStorage.setItem("next_group", nextGroup);
         
         currentGroup = nextGroup;
-        completedIndexes = [];
+        completedIndexes = []; // チェック状態をリセット
         renderMenu();
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
