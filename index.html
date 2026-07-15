@@ -164,7 +164,7 @@
       margin-top: 14px;
     }
 
-    /* タブコンテンツ制御 */
+    /* タブ切り替え用の設定 */
     .tab-content {
       display: none;
     }
@@ -173,7 +173,7 @@
       display: block;
     }
 
-    /* ボトムナビゲーションバー */
+    /* スマートフォン向けボトムナビゲーション */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -366,7 +366,6 @@
     let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
     let showDone = false;
 
-    // 見積もり時間のセレクトボックス生成
     const estimateInput = document.getElementById('estimateInput');
     for (let m = 10; m <= 480; m += 10) {
       const option = document.createElement('option');
@@ -375,7 +374,6 @@
       estimateInput.appendChild(option);
     }
 
-    // タブ切り替え機能
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -775,7 +773,7 @@
         .replaceAll("'", '&#039;');
     }
 
-    // 🆕 Service Worker登録システム
+    // Service Workerの登録
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js')
