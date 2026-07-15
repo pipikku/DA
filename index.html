@@ -6,56 +6,86 @@
   <title>タスク管理Webアプリ</title>
 
   <style>
+    /* 基本スタイル */
     body {
       margin: 0;
       font-family: system-ui, sans-serif;
       background: #f1f5f9;
       color: #0f172a;
+      line-height: 1.5; /* 行間を少し広く */
     }
 
     main {
       max-width: 900px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 40px 20px; /* 上下の余白を広げた */
     }
 
+    /* 各セクション（カード）の基本スタイル */
     .card {
       background: white;
       border-radius: 20px;
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      padding: 30px; /* パディングを少し広げた */
+      margin-bottom: 24px; /* カード間の余白を大きくした（修正点） */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06); /* 影を少し強調 */
     }
 
     h1, h2, h3 {
-      margin: 0 0 12px;
+      margin: 0 0 16px; /* 見出しの下部余白を調整 */
     }
 
+    /* フォーム要素共通スタイル */
     input, select, button {
       width: 100%;
       box-sizing: border-box;
-      padding: 12px;
+      padding: 14px; /* パディングを少し広く */
       border-radius: 12px;
       border: 1px solid #cbd5e1;
       font-size: 16px;
+      transition: border-color 0.2s; /* ホバー時のアニメーション */
     }
 
+    input:focus, select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    /* ラベルのスタイル */
+    label {
+      display: block;
+      margin-bottom: 6px; /* ラベルと入力欄の間に余白（修正点） */
+      font-weight: 500;
+      color: #475569;
+    }
+
+    /* ボタンの共通スタイル */
     button {
       cursor: pointer;
       font-weight: bold;
       background: white;
+      transition: background-color 0.2s, color 0.2s;
     }
 
+    /* 主要ボタン（追加） */
     .primary {
       background: #2563eb;
       color: white;
       border: none;
+      padding: 16px; /* 追加ボタンを目立たせるために広く */
+    }
+    .primary:hover {
+      background: #1d4ed8;
     }
 
+    /* その他ボタンカラー */
     .dark {
       background: #0f172a;
       color: white;
       border: none;
+    }
+    .dark:hover {
+      background: #1e293b;
     }
 
     .green {
@@ -63,52 +93,65 @@
       color: white;
       border: none;
     }
+    .green:hover {
+      background: #15803d;
+    }
 
     .danger {
       color: #dc2626;
       border-color: #fecaca;
     }
+    .danger:hover {
+      background: #fef2f2;
+    }
 
+    /* グリッドレイアウト */
     .grid {
       display: grid;
-      gap: 12px;
+      gap: 12px; /* 基本的な要素間の間隔 */
     }
 
     .grid2 {
       grid-template-columns: repeat(2, 1fr);
+      gap: 20px; /* グリッド要素間の間隔を広く（修正点） */
     }
 
     .grid4 {
       grid-template-columns: repeat(4, 1fr);
+      gap: 16px; /* 検索/操作エリアの要素間隔 */
     }
 
+    /* サマリーセクション */
     .summary {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
+      gap: 20px; /* サマリー要素間の間隔を広く（修正点） */
+      margin-bottom: 24px; /* カード間の余白と統一 */
     }
 
     .summary div {
       background: white;
       border-radius: 16px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      padding: 20px; /* パディングを広く */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
 
     .summary p {
       margin: 0;
       color: #64748b;
-      font-size: 13px;
+      font-size: 14px; /* フォントを少し大きく */
     }
 
     .summary strong {
       display: block;
-      font-size: 26px;
-      margin-top: 6px;
+      font-size: 32px; /* 数字をより大きく強調 */
+      margin-top: 10px; /* 数字の上の余白を調整 */
     }
 
+    /* 各タスク要素のスタイル */
     .task {
       border-left: 6px solid #2563eb;
+      margin-bottom: 16px; /* タスク同士の余白 */
     }
 
     .task.done {
@@ -119,43 +162,62 @@
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .badge {
       background: #e2e8f0;
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 999px;
-      font-size: 12px;
-      font-weight: bold;
+      font-size: 13px;
+      font-weight: 500;
     }
 
     .info {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      gap: 10px; /* 情報項目の間隔 */
       color: #475569;
       font-size: 14px;
+      margin-bottom: 16px; /* 情報とIf-Thenプランの間に余白（修正点） */
     }
 
-    .ifthen {
+    .ifthen-display {
       background: #eff6ff;
-      padding: 12px;
+      padding: 16px;
       border-radius: 14px;
-      margin-top: 12px;
+      margin-top: 16px;
       font-size: 14px;
     }
 
     .actions {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 14px;
+      gap: 12px; /* アクションボタンの間隔 */
+      margin-top: 20px; /* ボタンエリアの上の余白を調整（修正点） */
     }
 
+    /* フォーム項目を囲むdivに下部余白を追加するためのクラス */
+    .form-item {
+      margin-bottom: 20px; /* 各フォーム項目の間に余白（修正点） */
+    }
+
+    /* If-Thenプラン入力エリア */
+    .ifthen-input-container {
+      background: #eff6ff;
+      padding: 20px; /* パディングを広く */
+      border-radius: 16px;
+      margin-top: 24px; /* If-Then入力欄の上の余白を大きく（修正点） */
+    }
+
+    /* レスポンシブ対応 (最大幅 700px) */
     @media (max-width: 700px) {
-      .grid2, .grid4, .summary, .info, .actions {
+      .grid2, .grid4, .summary, .info, .actions, .summary div, .ifthen-input-container .grid2 {
         grid-template-columns: 1fr;
+        gap: 16px; /* スマホ表示時の要素間隔 */
+      }
+      .summary div {
+          padding: 16px;
       }
     }
   </style>
@@ -164,9 +226,9 @@
 <body>
   <main>
     <section class="card">
-      <p style="color:#2563eb;font-weight:bold;">卒業制作 試作版</p>
+      <p style="color:#2563eb;font-weight:bold;margin-bottom: 8px;">卒業制作 試作版</p>
       <h1>タスク管理Webアプリ</h1>
-      <p>
+      <p style="margin: 0;">
         見積もり時間、If-Thenプラン、着手・完了ログを記録し、
         実際の作業時間と見積もり誤差を確認できます。
       </p>
@@ -183,25 +245,27 @@
       <h2>タスクの追加</h2>
 
       <div class="grid">
-        <input id="titleInput" placeholder="タスク名 例：卒論の背景を書く" />
+        <div class="form-item">
+          <input id="titleInput" placeholder="タスク名 例：卒論の背景を書く" />
+        </div>
 
-        <div class="grid grid2">
-          <label>
-            期限
+        <div class="grid grid2 form-item">
+          <div>
+            <label>期限</label>
             <input id="dueInput" type="date" />
-          </label>
+          </div>
 
-          <label>
-            見積もり時間
+          <div>
+            <label>見積もり時間</label>
             <select id="estimateInput">
               <option value="">未設定</option>
             </select>
-          </label>
+          </div>
         </div>
 
-        <div class="grid grid2">
-          <label>
-            カテゴリ
+        <div class="grid grid2 form-item">
+          <div>
+            <label>カテゴリ</label>
             <select id="categoryInput">
               <option>課題</option>
               <option>自習</option>
@@ -209,23 +273,25 @@
               <option>トレーニング</option>
               <option>その他</option>
             </select>
-          </label>
+          </div>
 
-          <label>
-            優先度
+          <div>
+            <label>優先度</label>
             <select id="priorityInput">
               <option>高</option>
               <option selected>中</option>
               <option>低</option>
             </select>
-          </label>
+          </div>
         </div>
 
-        <input id="tagsInput" placeholder="タグ・メモ 例：レポート, 重要" />
+        <div class="form-item">
+          <input id="tagsInput" placeholder="タグ・メモ 例：レポート, 重要" />
+        </div>
 
-        <div class="ifthen">
-          <strong>If-Thenプラン</strong>
-          <div class="grid grid2" style="margin-top:10px;">
+        <div class="ifthen-input-container form-item">
+          <strong style="display: block; margin-bottom: 12px; color: #1e40af;">If-Thenプラン</strong>
+          <div class="grid grid2">
             <input id="ifInput" placeholder="If：例 授業が終わったら" />
             <input id="thenInput" placeholder="Then：例 図書館で30分進める" />
           </div>
@@ -236,7 +302,7 @@
     </section>
 
     <section class="card">
-      <div class="grid">
+      <div class="grid" style="gap: 16px;">
         <input id="searchInput" placeholder="検索：タイトル・タグ・If-Then" oninput="render()" />
 
         <div class="grid grid4">
@@ -524,7 +590,7 @@
       const list = getFilteredTasks();
 
       if (list.length === 0) {
-        taskList.innerHTML = '<div class="card">該当するタスクがありません。</div>';
+        taskList.innerHTML = '<div class="card" style="text-align: center; color: #64748b;">該当するタスクがありません。</div>';
         return;
       }
 
@@ -540,10 +606,10 @@
             <div class="badges">
               <span class="badge">${task.category}</span>
               <span class="badge">優先度：${task.priority}</span>
-              ${task.done ? '<span class="badge">完了</span>' : ''}
+              ${task.done ? '<span class="badge" style="background: #16a34a; color: white;">完了</span>' : ''}
             </div>
 
-            <h3>${escapeHtml(task.title)}</h3>
+            <h3 style="margin-bottom: 12px;">${escapeHtml(task.title)}</h3>
 
             <div class="info">
               <p>期限：${task.due || '期限なし'}</p>
@@ -561,10 +627,10 @@
             ${
               task.ifCondition || task.thenAction
                 ? `
-                  <div class="ifthen">
-                    <strong>If-Then</strong>
-                    <p>If：${escapeHtml(task.ifCondition || '未設定')}</p>
-                    <p>Then：${escapeHtml(task.thenAction || '未設定')}</p>
+                  <div class="ifthen-display">
+                    <strong style="display: block; margin-bottom: 8px; color: #1e40af;">If-Then</strong>
+                    <p style="margin: 0 0 6px 0;">If：${escapeHtml(task.ifCondition || '未設定')}</p>
+                    <p style="margin: 0;">Then：${escapeHtml(task.thenAction || '未設定')}</p>
                   </div>
                 `
                 : ''
@@ -572,7 +638,7 @@
 
             ${
               task.tags && task.tags.length > 0
-                ? `<p>${task.tags.map(tag => `#${escapeHtml(tag)}`).join(' ')}</p>`
+                ? `<p style="margin-top: 16px; margin-bottom: 0;">${task.tags.map(tag => `<span style="color: #64748b; margin-right: 8px;">#${escapeHtml(tag)}</span>`).join('')}</p>`
                 : ''
             }
 
