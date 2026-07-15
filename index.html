@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>タスク管理Webアプリ</title>
 
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
   <style>
     /* 基本モバイルファースト設計 */
     body {
@@ -288,21 +293,15 @@
       margin-top: 12px;
     }
 
-    /* ==========================================
-       🆕 タブ切り替え＆ボトムナビゲーションのスタイル
-       ========================================== */
-    
-    /* 初期状態ですべてのタブコンテンツを非表示に */
+    /* タブ切り替え＆ボトムナビゲーション */
     .tab-content {
       display: none;
     }
 
-    /* activeクラスがついているタブコンテンツだけを表示 */
     .tab-content.active {
       display: block;
     }
 
-    /* 画面下部固定のナビゲーションバー */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -310,16 +309,15 @@
       right: 0;
       height: 64px;
       background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(12px); /* おしゃれなすりガラス効果 */
+      backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-top: 1px solid rgba(226, 232, 240, 0.8);
       display: grid;
-      grid-template-columns: repeat(3, 1fr); /* 3つの等幅タブ */
+      grid-template-columns: repeat(3, 1fr);
       z-index: 1000;
-      padding-bottom: env(safe-area-inset-bottom); /* iPhone等のノッチ回避用の余白 */
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
-    /* 各タブボタンの装飾 */
     .nav-item {
       display: flex;
       flex-direction: column;
@@ -338,7 +336,7 @@
     }
 
     .nav-item:active {
-      transform: none; /* タブは凹むアニメーションを無効化して滑らかに */
+      transform: none;
     }
 
     .nav-item .icon {
@@ -347,16 +345,14 @@
       transition: transform 0.15s ease;
     }
 
-    /* アクティブ（現在開いている）タブのスタイル */
     .nav-item.active {
       color: #2563eb;
     }
 
     .nav-item.active .icon {
-      transform: scale(1.15); /* アクティブなアイコンを少し大きく */
+      transform: scale(1.15);
     }
 
-    /* レスポンシブ微調整（超小型スマホ向け） */
     @media (max-width: 360px) {
       .actions {
         grid-template-columns: 1fr;
@@ -370,9 +366,6 @@
 
 <body>
   <main>
-    <!-- ==========================================
-         🏠 タブ1: ホーム（ダッシュボード＆管理）
-         ========================================== -->
     <section id="tab-home" class="tab-content active">
       <div class="card" style="text-align: center; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: none;">
         <p style="color:#2563eb; font-weight:800; font-size: 12px; text-transform: uppercase; margin: 0 0 4px 0; letter-spacing: 1px;">卒業制作 試作版</p>
@@ -382,7 +375,6 @@
         </p>
       </div>
 
-      <!-- サマリー統計エリア -->
       <div class="summary">
         <div><p>総タスク</p><strong id="totalCount">0</strong></div>
         <div><p>着手率</p><strong id="startRate">0%</strong></div>
@@ -390,7 +382,6 @@
         <div><p>平均誤差</p><strong id="averageError">-</strong></div>
       </div>
 
-      <!-- データ管理（CSV出力・データリセット） -->
       <div class="card">
         <h2>📊 データ管理</h2>
         <div class="grid" style="gap: 12px;">
@@ -403,10 +394,6 @@
       </div>
     </section>
 
-
-    <!-- ==========================================
-         ➕ タブ2: タスク追加
-         ========================================== -->
     <section id="tab-add" class="tab-content">
       <div class="card">
         <h2>✍️ 新しいタスクを追加</h2>
@@ -478,12 +465,7 @@
       </div>
     </section>
 
-
-    <!-- ==========================================
-         🔍 タブ3: タスク一覧（検索・表示）
-         ========================================== -->
     <section id="tab-list" class="tab-content">
-      <!-- 検索＆フィルター操作パネル -->
       <div class="card" style="background: #f1f5f9; padding: 16px;">
         <div class="grid" style="gap: 12px;">
           <input id="searchInput" placeholder="🔍 検索：タイトル・タグ・If-Then" oninput="render()" style="background: white;" />
@@ -511,14 +493,10 @@
         </div>
       </div>
 
-      <!-- タスク一覧表示領域 -->
       <div id="taskList"></div>
     </section>
   </main>
 
-  <!-- ==========================================
-       📱 画面最下部固定のタブナビゲーションバー
-       ========================================== -->
   <nav class="bottom-nav">
     <button class="nav-item active" onclick="switchTab('home')" id="nav-home">
       <span class="icon">🏠</span>
@@ -539,27 +517,20 @@
     let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
     let showDone = false;
 
-    // ==========================================
-    // 🆕 タブ切り替え制御関数
-    // ==========================================
+    // タブ切り替え制御
     function switchTab(tabName) {
-      // 全てのコンテンツエリアを非表示にする
       document.querySelectorAll('.tab-content').forEach(el => {
         el.classList.remove('active');
       });
-      // 全てのナビボタンのアクティブ表示をリセット
       document.querySelectorAll('.nav-item').forEach(el => {
         el.classList.remove('active');
       });
 
-      // 対象のタブとナビボタンをアクティブにする
       document.getElementById(`tab-${tabName}`).classList.add('active');
       document.getElementById(`nav-${tabName}`).classList.add('active');
 
-      // 画面を最上部までスクロール
       window.scrollTo({ top: 0, behavior: 'instant' });
 
-      // リストタブが選択された場合は再レンダリング
       if (tabName === 'list') {
         render();
       }
@@ -598,7 +569,7 @@
       return Math.max(1, Math.round((task.completedAt - task.startedAt) / 60000));
     }
 
-    // タスク追加処理
+    // タスク追加
     function addTask() {
       const title = document.getElementById('titleInput').value.trim();
       if (!title) {
@@ -627,7 +598,6 @@
       save();
       clearForm();
       
-      // 保存したあと「🔍 タスク一覧」タブへ自動で画面を切り替えてリストを更新する
       switchTab('list');
     }
 
@@ -807,7 +777,6 @@
       const taskList = document.getElementById('taskList');
       const list = getFilteredTasks();
 
-      // 現在の一覧画面の表示タスク数を更新
       document.getElementById('currentListCount').textContent = list.length;
 
       if (list.length === 0) {
@@ -952,7 +921,15 @@
         .replaceAll("'", '&#039;');
     }
 
-    // 初期化時はホームタブから表示
+    // 🆕 Service Worker（sw.js）の登録処理
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker 登録成功:', reg))
+          .catch(err => console.error('Service Worker 登録失敗:', err));
+      });
+    }
+
     renderSummary();
   </script>
 </body>
