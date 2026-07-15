@@ -2,222 +2,367 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>タスク管理Webアプリ</title>
 
   <style>
-    /* 基本スタイル */
+    /* 基本モバイルファースト設計 */
     body {
       margin: 0;
-      font-family: system-ui, sans-serif;
-      background: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #f8fafc;
       color: #0f172a;
-      line-height: 1.5; /* 行間を少し広く */
+      line-height: 1.6;
+      -webkit-tap-highlight-color: transparent;
+      padding-bottom: 80px; /* 下部タブバーと被らないように余白を確保 */
     }
 
     main {
-      max-width: 900px;
+      max-width: 600px;
       margin: 0 auto;
-      padding: 40px 20px; /* 上下の余白を広げた */
+      padding: 16px;
     }
 
     /* 各セクション（カード）の基本スタイル */
     .card {
       background: white;
-      border-radius: 20px;
-      padding: 30px; /* パディングを少し広げた */
-      margin-bottom: 24px; /* カード間の余白を大きくした（修正点） */
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06); /* 影を少し強調 */
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(241, 245, 249, 0.8);
     }
 
-    h1, h2, h3 {
-      margin: 0 0 16px; /* 見出しの下部余白を調整 */
+    h1 {
+      font-size: 22px;
+      font-weight: 800;
+      margin: 0 0 8px;
+      letter-spacing: -0.5px;
     }
 
-    /* フォーム要素共通スタイル */
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 16px;
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0 0 12px;
+      line-height: 1.4;
+    }
+
+    /* フォーム要素 */
     input, select, button {
       width: 100%;
       box-sizing: border-box;
-      padding: 14px; /* パディングを少し広く */
-      border-radius: 12px;
-      border: 1px solid #cbd5e1;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1.5px solid #e2e8f0;
       font-size: 16px;
-      transition: border-color 0.2s; /* ホバー時のアニメーション */
+      background: #f8fafc;
+      color: #0f172a;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 16px;
+      padding-right: 40px;
+    }
+
+    /* 見積もり時間入力 */
+    .input-with-unit {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-with-unit input {
+      padding-right: 45px;
+    }
+
+    .input-with-unit .unit {
+      position: absolute;
+      right: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #64748b;
+      pointer-events: none;
     }
 
     input:focus, select:focus {
       outline: none;
       border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
     }
 
-    /* ラベルのスタイル */
     label {
       display: block;
-      margin-bottom: 6px; /* ラベルと入力欄の間に余白（修正点） */
-      font-weight: 500;
-      color: #475569;
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      padding-left: 4px;
     }
 
-    /* ボタンの共通スタイル */
+    /* ボタン */
     button {
       cursor: pointer;
-      font-weight: bold;
-      background: white;
-      transition: background-color 0.2s, color 0.2s;
+      font-weight: 700;
+      background: #f1f5f9;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
 
-    /* 主要ボタン（追加） */
+    button:active {
+      transform: scale(0.98);
+    }
+
     .primary {
       background: #2563eb;
       color: white;
-      border: none;
-      padding: 16px; /* 追加ボタンを目立たせるために広く */
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
     }
-    .primary:hover {
+    .primary:hover, .primary:active {
       background: #1d4ed8;
     }
 
-    /* その他ボタンカラー */
     .dark {
       background: #0f172a;
       color: white;
-      border: none;
-    }
-    .dark:hover {
-      background: #1e293b;
     }
 
     .green {
-      background: #16a34a;
+      background: #10b981;
       color: white;
-      border: none;
-    }
-    .green:hover {
-      background: #15803d;
     }
 
     .danger {
-      color: #dc2626;
-      border-color: #fecaca;
-    }
-    .danger:hover {
+      color: #ef4444;
       background: #fef2f2;
+      border: 1px solid #fee2e2;
     }
 
-    /* グリッドレイアウト */
+    /* グリッドシステム */
     .grid {
       display: grid;
-      gap: 12px; /* 基本的な要素間の間隔 */
+      gap: 12px;
     }
 
     .grid2 {
       grid-template-columns: repeat(2, 1fr);
-      gap: 20px; /* グリッド要素間の間隔を広く（修正点） */
+      gap: 12px;
     }
 
     .grid4 {
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px; /* 検索/操作エリアの要素間隔 */
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
     }
 
-    /* サマリーセクション */
+    /* サマリー */
     .summary {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px; /* サマリー要素間の間隔を広く（修正点） */
-      margin-bottom: 24px; /* カード間の余白と統一 */
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
     }
 
     .summary div {
       background: white;
-      border-radius: 16px;
-      padding: 20px; /* パディングを広く */
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.02);
+      border: 1px solid rgba(241, 245, 249, 0.8);
     }
 
     .summary p {
       margin: 0;
       color: #64748b;
-      font-size: 14px; /* フォントを少し大きく */
+      font-size: 12px;
+      font-weight: 600;
     }
 
     .summary strong {
       display: block;
-      font-size: 32px; /* 数字をより大きく強調 */
-      margin-top: 10px; /* 数字の上の余白を調整 */
+      font-size: 24px;
+      font-weight: 800;
+      margin-top: 6px;
+      color: #0f172a;
     }
 
-    /* 各タスク要素のスタイル */
+    /* タスクカード */
     .task {
       border-left: 6px solid #2563eb;
-      margin-bottom: 16px; /* タスク同士の余白 */
+      position: relative;
     }
 
     .task.done {
-      opacity: 0.55;
+      opacity: 0.6;
+      border-left-color: #94a3b8;
     }
 
     .badges {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
       margin-bottom: 12px;
     }
 
     .badge {
-      background: #e2e8f0;
-      padding: 5px 12px;
+      background: #f1f5f9;
+      padding: 4px 10px;
       border-radius: 999px;
-      font-size: 13px;
-      font-weight: 500;
+      font-size: 11px;
+      font-weight: 700;
+      color: #475569;
     }
 
     .info {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px; /* 情報項目の間隔 */
+      gap: 12px 8px;
       color: #475569;
-      font-size: 14px;
-      margin-bottom: 16px; /* 情報とIf-Thenプランの間に余白（修正点） */
+      font-size: 13px;
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+    }
+
+    .info p {
+      margin: 0;
+    }
+
+    .info strong {
+      color: #0f172a;
     }
 
     .ifthen-display {
       background: #eff6ff;
-      padding: 16px;
-      border-radius: 14px;
-      margin-top: 16px;
-      font-size: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      font-size: 13px;
+      border: 1px dashed #bfdbfe;
+      margin-top: 12px;
+    }
+
+    .ifthen-display p {
+      margin: 4px 0 0;
     }
 
     .actions {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px; /* アクションボタンの間隔 */
-      margin-top: 20px; /* ボタンエリアの上の余白を調整（修正点） */
+      gap: 8px;
+      margin-top: 16px;
     }
 
-    /* フォーム項目を囲むdivに下部余白を追加するためのクラス */
+    .actions button {
+      padding: 12px 8px;
+      font-size: 14px;
+      border-radius: 12px;
+    }
+
     .form-item {
-      margin-bottom: 20px; /* 各フォーム項目の間に余白（修正点） */
+      margin-bottom: 4px;
     }
 
-    /* If-Thenプラン入力エリア */
     .ifthen-input-container {
       background: #eff6ff;
-      padding: 20px; /* パディングを広く */
-      border-radius: 16px;
-      margin-top: 24px; /* If-Then入力欄の上の余白を大きく（修正点） */
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid #dbeafe;
+      margin-top: 12px;
     }
 
-    /* レスポンシブ対応 (最大幅 700px) */
-    @media (max-width: 700px) {
-      .grid2, .grid4, .summary, .info, .actions, .summary div, .ifthen-input-container .grid2 {
+    /* ==========================================
+       🆕 タブ切り替え＆ボトムナビゲーションのスタイル
+       ========================================== */
+    
+    /* 初期状態ですべてのタブコンテンツを非表示に */
+    .tab-content {
+      display: none;
+    }
+
+    /* activeクラスがついているタブコンテンツだけを表示 */
+    .tab-content.active {
+      display: block;
+    }
+
+    /* 画面下部固定のナビゲーションバー */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px); /* おしゃれなすりガラス効果 */
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(226, 232, 240, 0.8);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* 3つの等幅タブ */
+      z-index: 1000;
+      padding-bottom: env(safe-area-inset-bottom); /* iPhone等のノッチ回避用の余白 */
+    }
+
+    /* 各タブボタンの装飾 */
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      padding: 4px 0;
+      width: 100%;
+      height: 100%;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 700;
+      transition: color 0.15s ease;
+      cursor: pointer;
+    }
+
+    .nav-item:active {
+      transform: none; /* タブは凹むアニメーションを無効化して滑らかに */
+    }
+
+    .nav-item .icon {
+      font-size: 20px;
+      margin-bottom: 2px;
+      transition: transform 0.15s ease;
+    }
+
+    /* アクティブ（現在開いている）タブのスタイル */
+    .nav-item.active {
+      color: #2563eb;
+    }
+
+    .nav-item.active .icon {
+      transform: scale(1.15); /* アクティブなアイコンを少し大きく */
+    }
+
+    /* レスポンシブ微調整（超小型スマホ向け） */
+    @media (max-width: 360px) {
+      .actions {
         grid-template-columns: 1fr;
-        gap: 16px; /* スマホ表示時の要素間隔 */
       }
-      .summary div {
-          padding: 16px;
+      .grid4 {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -225,132 +370,199 @@
 
 <body>
   <main>
-    <section class="card">
-      <p style="color:#2563eb;font-weight:bold;margin-bottom: 8px;">卒業制作 試作版</p>
-      <h1>タスク管理Webアプリ</h1>
-      <p style="margin: 0;">
-        見積もり時間、If-Thenプラン、着手・完了ログを記録し、
-        実際の作業時間と見積もり誤差を確認できます。
-      </p>
-    </section>
+    <!-- ==========================================
+         🏠 タブ1: ホーム（ダッシュボード＆管理）
+         ========================================== -->
+    <section id="tab-home" class="tab-content active">
+      <div class="card" style="text-align: center; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: none;">
+        <p style="color:#2563eb; font-weight:800; font-size: 12px; text-transform: uppercase; margin: 0 0 4px 0; letter-spacing: 1px;">卒業制作 試作版</p>
+        <h1>タスク管理Webアプリ</h1>
+        <p style="margin: 0; font-size: 13px; color: #475569;">
+          見積もり時間と実績の誤差を確認し、時間管理の精度を上げましょう。
+        </p>
+      </div>
 
-    <section class="summary">
-      <div><p>総タスク</p><strong id="totalCount">0</strong></div>
-      <div><p>着手率</p><strong id="startRate">0%</strong></div>
-      <div><p>完了率</p><strong id="completeRate">0%</strong></div>
-      <div><p>平均見積もり誤差</p><strong id="averageError">-</strong></div>
-    </section>
+      <!-- サマリー統計エリア -->
+      <div class="summary">
+        <div><p>総タスク</p><strong id="totalCount">0</strong></div>
+        <div><p>着手率</p><strong id="startRate">0%</strong></div>
+        <div><p>完了率</p><strong id="completeRate">0%</strong></div>
+        <div><p>平均誤差</p><strong id="averageError">-</strong></div>
+      </div>
 
-    <section class="card">
-      <h2>タスクの追加</h2>
-
-      <div class="grid">
-        <div class="form-item">
-          <input id="titleInput" placeholder="タスク名 例：卒論の背景を書く" />
+      <!-- データ管理（CSV出力・データリセット） -->
+      <div class="card">
+        <h2>📊 データ管理</h2>
+        <div class="grid" style="gap: 12px;">
+          <button onclick="exportCsv()" class="dark" style="padding: 16px;">📂 ログデータをCSV出力</button>
+          <div class="grid grid2" style="margin-top: 4px;">
+            <button onclick="clearDone()" style="font-size: 13px;">完了済を一括削除</button>
+            <button class="danger" onclick="clearAll()" style="font-size: 13px;">全データ削除</button>
+          </div>
         </div>
+      </div>
+    </section>
 
-        <div class="grid grid2 form-item">
-          <div>
-            <label>期限</label>
-            <input id="dueInput" type="date" />
+
+    <!-- ==========================================
+         ➕ タブ2: タスク追加
+         ========================================== -->
+    <section id="tab-add" class="tab-content">
+      <div class="card">
+        <h2>✍️ 新しいタスクを追加</h2>
+
+        <div class="grid">
+          <div class="form-item">
+            <label>タスク名</label>
+            <input id="titleInput" placeholder="例：卒論の背景を書く" />
           </div>
 
-          <div>
-            <label>見積もり時間</label>
-            <select id="estimateInput">
-              <option value="">未設定</option>
+          <div class="grid grid2 form-item">
+            <div>
+              <label>期限</label>
+              <input id="dueInput" type="date" />
+            </div>
+
+            <div>
+              <label>見積もり時間</label>
+              <div class="input-with-unit">
+                <input id="estimateInput" type="number" min="1" pattern="[0-9]*" inputmode="numeric" placeholder="例：30" />
+                <span class="unit">分</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid2 form-item">
+            <div>
+              <label>カテゴリ</label>
+              <select id="categoryInput">
+                <option>課題</option>
+                <option>自習</option>
+                <option>アルバイト</option>
+                <option>トレーニング</option>
+                <option>その他</option>
+              </select>
+            </div>
+
+            <div>
+              <label>優先度</label>
+              <select id="priorityInput">
+                <option>高</option>
+                <option selected>中</option>
+                <option>低</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-item">
+            <label>タグ・メモ</label>
+            <input id="tagsInput" placeholder="例：レポート, 重要 (カンマ区切り)" />
+          </div>
+
+          <div class="ifthen-input-container form-item">
+            <strong style="display: block; margin-bottom: 10px; color: #1e40af; font-size: 14px;">If-Thenプラン（行動の習慣化）</strong>
+            <div class="grid grid2">
+              <div>
+                <label style="color: #1e40af;">If（もし〜なら）</label>
+                <input id="ifInput" placeholder="例：授業が終わったら" style="background: white;" />
+              </div>
+              <div>
+                <label style="color: #1e40af;">Then（そのとき〜する）</label>
+                <input id="thenInput" placeholder="例：図書館で30分進める" style="background: white;" />
+              </div>
+            </div>
+          </div>
+
+          <button class="primary" onclick="addTask()">タスクを追加する</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==========================================
+         🔍 タブ3: タスク一覧（検索・表示）
+         ========================================== -->
+    <section id="tab-list" class="tab-content">
+      <!-- 検索＆フィルター操作パネル -->
+      <div class="card" style="background: #f1f5f9; padding: 16px;">
+        <div class="grid" style="gap: 12px;">
+          <input id="searchInput" placeholder="🔍 検索：タイトル・タグ・If-Then" oninput="render()" style="background: white;" />
+
+          <div class="grid4">
+            <select id="sortInput" onchange="render()" style="background-color: white;">
+              <option value="due">📅 期限順</option>
+              <option value="new">🆕 新しい順</option>
+              <option value="old">⏳ 古い順</option>
+              <option value="priority">🔥 優先度順</option>
             </select>
-          </div>
-        </div>
 
-        <div class="grid grid2 form-item">
-          <div>
-            <label>カテゴリ</label>
-            <select id="categoryInput">
+            <select id="categoryFilter" onchange="render()" style="background-color: white;">
+              <option value="all">📁 すべてカテゴリ</option>
               <option>課題</option>
               <option>自習</option>
               <option>アルバイト</option>
               <option>トレーニング</option>
               <option>その他</option>
             </select>
-          </div>
 
-          <div>
-            <label>優先度</label>
-            <select id="priorityInput">
-              <option>高</option>
-              <option selected>中</option>
-              <option>低</option>
-            </select>
+            <button onclick="toggleDone()" id="doneToggleBtn" style="background-color: white; font-size: 13px; padding: 10px;">未完了のみ</button>
+            <span style="display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #64748b;">タスク数: <span id="currentListCount" style="margin-left: 4px; color:#2563eb;">0</span></span>
           </div>
         </div>
-
-        <div class="form-item">
-          <input id="tagsInput" placeholder="タグ・メモ 例：レポート, 重要" />
-        </div>
-
-        <div class="ifthen-input-container form-item">
-          <strong style="display: block; margin-bottom: 12px; color: #1e40af;">If-Thenプラン</strong>
-          <div class="grid grid2">
-            <input id="ifInput" placeholder="If：例 授業が終わったら" />
-            <input id="thenInput" placeholder="Then：例 図書館で30分進める" />
-          </div>
-        </div>
-
-        <button class="primary" onclick="addTask()">タスクを追加</button>
       </div>
-    </section>
 
-    <section class="card">
-      <div class="grid" style="gap: 16px;">
-        <input id="searchInput" placeholder="検索：タイトル・タグ・If-Then" oninput="render()" />
-
-        <div class="grid grid4">
-          <select id="sortInput" onchange="render()">
-            <option value="due">期限順</option>
-            <option value="new">新しい順</option>
-            <option value="old">古い順</option>
-            <option value="priority">優先度順</option>
-          </select>
-
-          <select id="categoryFilter" onchange="render()">
-            <option value="all">カテゴリ：すべて</option>
-            <option>課題</option>
-            <option>自習</option>
-            <option>アルバイト</option>
-            <option>トレーニング</option>
-            <option>その他</option>
-          </select>
-
-          <button onclick="toggleDone()" id="doneToggleBtn">未完了のみ表示中</button>
-          <button onclick="exportCsv()">CSV出力</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="taskList"></section>
-
-    <section class="card">
-      <h2>管理</h2>
-      <div class="grid grid2">
-        <button onclick="clearDone()">完了済みを一括削除</button>
-        <button class="danger" onclick="clearAll()">全データ削除</button>
-      </div>
+      <!-- タスク一覧表示領域 -->
+      <div id="taskList"></div>
     </section>
   </main>
+
+  <!-- ==========================================
+       📱 画面最下部固定のタブナビゲーションバー
+       ========================================== -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('home')" id="nav-home">
+      <span class="icon">🏠</span>
+      <span>ホーム</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('add')" id="nav-add">
+      <span class="icon">➕</span>
+      <span>タスク追加</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('list')" id="nav-list">
+      <span class="icon">🔍</span>
+      <span>タスク一覧</span>
+    </button>
+  </nav>
 
   <script>
     const STORAGE_KEY = 'graduation_task_app_html_v1';
     let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
     let showDone = false;
 
-    const estimateInput = document.getElementById('estimateInput');
+    // ==========================================
+    // 🆕 タブ切り替え制御関数
+    // ==========================================
+    function switchTab(tabName) {
+      // 全てのコンテンツエリアを非表示にする
+      document.querySelectorAll('.tab-content').forEach(el => {
+        el.classList.remove('active');
+      });
+      // 全てのナビボタンのアクティブ表示をリセット
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.remove('active');
+      });
 
-    for (let m = 10; m <= 480; m += 10) {
-      const option = document.createElement('option');
-      option.value = m;
-      option.textContent = formatMinutes(m);
-      estimateInput.appendChild(option);
+      // 対象のタブとナビボタンをアクティブにする
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+      document.getElementById(`nav-${tabName}`).classList.add('active');
+
+      // 画面を最上部までスクロール
+      window.scrollTo({ top: 0, behavior: 'instant' });
+
+      // リストタブが選択された場合は再レンダリング
+      if (tabName === 'list') {
+        render();
+      }
     }
 
     function save() {
@@ -371,10 +583,9 @@
     }
 
     function formatJST(timestamp) {
-      if (!timestamp) return '';
+      if (!timestamp) return '未記録';
       return new Intl.DateTimeFormat('ja-JP', {
         timeZone: 'Asia/Tokyo',
-        year: 'numeric',
         month: '2-digit',
         day: '2-digit',
         hour: '2-digit',
@@ -387,11 +598,16 @@
       return Math.max(1, Math.round((task.completedAt - task.startedAt) / 60000));
     }
 
+    // タスク追加処理
     function addTask() {
       const title = document.getElementById('titleInput').value.trim();
-      if (!title) return;
+      if (!title) {
+        alert('タスク名を入力してください。');
+        return;
+      }
 
       const tagsText = document.getElementById('tagsInput').value;
+      const rawEstimate = document.getElementById('estimateInput').value;
 
       const task = {
         id: uid(),
@@ -402,9 +618,7 @@
         category: document.getElementById('categoryInput').value,
         priority: document.getElementById('priorityInput').value,
         tags: tagsText.split(',').map(t => t.trim()).filter(Boolean),
-        estimateMin: document.getElementById('estimateInput').value
-          ? Number(document.getElementById('estimateInput').value)
-          : undefined,
+        estimateMin: rawEstimate ? Number(rawEstimate) : undefined,
         ifCondition: document.getElementById('ifInput').value.trim(),
         thenAction: document.getElementById('thenInput').value.trim()
       };
@@ -412,7 +626,9 @@
       tasks.unshift(task);
       save();
       clearForm();
-      render();
+      
+      // 保存したあと「🔍 タスク一覧」タブへ自動で画面を切り替えてリストを更新する
+      switchTab('list');
     }
 
     function clearForm() {
@@ -483,7 +699,7 @@
     function toggleDone() {
       showDone = !showDone;
       document.getElementById('doneToggleBtn').textContent =
-        showDone ? '完了タスクも表示中' : '未完了のみ表示中';
+        showDone ? '🟢 全て表示中' : '🔵 未完了表示中';
       render();
     }
 
@@ -491,13 +707,15 @@
       if (!confirm('完了済みタスクを一括削除しますか？')) return;
       tasks = tasks.filter(task => !task.done);
       save();
+      renderSummary();
       render();
     }
 
     function clearAll() {
-      if (!confirm('全データを削除しますか？')) return;
+      if (!confirm('全データを削除しますか？\n(注意: ローカルストレージ内のこのアプリの全データが失われます)')) return;
       tasks = [];
       save();
+      renderSummary();
       render();
     }
 
@@ -589,8 +807,11 @@
       const taskList = document.getElementById('taskList');
       const list = getFilteredTasks();
 
+      // 現在の一覧画面の表示タスク数を更新
+      document.getElementById('currentListCount').textContent = list.length;
+
       if (list.length === 0) {
-        taskList.innerHTML = '<div class="card" style="text-align: center; color: #64748b;">該当するタスクがありません。</div>';
+        taskList.innerHTML = '<div class="card" style="text-align: center; color: #64748b; font-size: 14px; padding: 32px 16px;">該当するタスクがありません。</div>';
         return;
       }
 
@@ -604,33 +825,33 @@
         return `
           <article class="card task ${task.done ? 'done' : ''}">
             <div class="badges">
-              <span class="badge">${task.category}</span>
-              <span class="badge">優先度：${task.priority}</span>
-              ${task.done ? '<span class="badge" style="background: #16a34a; color: white;">完了</span>' : ''}
+              <span class="badge" style="background: #eff6ff; color: #2563eb;">${task.category}</span>
+              <span class="badge" style="background: ${task.priority === '高' ? '#fef2f2; color: #ef4444;' : '#f8fafc; color: #475569;'}">優先度：${task.priority}</span>
+              ${task.done ? '<span class="badge" style="background: #d1fae5; color: #065f46;">✅ 完了</span>' : ''}
             </div>
 
-            <h3 style="margin-bottom: 12px;">${escapeHtml(task.title)}</h3>
+            <h3>${escapeHtml(task.title)}</h3>
 
             <div class="info">
-              <p>期限：${task.due || '期限なし'}</p>
-              <p>見積もり：${formatMinutes(task.estimateMin)}</p>
-              <p>着手：${formatJST(task.startedAt) || '未記録'}</p>
-              <p>完了：${formatJST(task.completedAt) || '未記録'}</p>
-              <p>実際にかかった時間：${formatMinutes(actualMin)}</p>
-              <p>見積もりとの差：${
+              <p>期限: <strong>${task.due || 'なし'}</strong></p>
+              <p>見積: <strong>${formatMinutes(task.estimateMin)}</strong></p>
+              <p>着手: <strong>${task.startedAt ? formatJST(task.startedAt) : '未記録'}</strong></p>
+              <p>完了: <strong>${task.completedAt ? formatJST(task.completedAt) : '未記録'}</strong></p>
+              <p>実績: <strong>${formatMinutes(actualMin)}</strong></p>
+              <p>誤差: <strong style="color: ${estimateError > 0 ? '#ef4444' : estimateError < 0 ? '#2563eb' : '#0f172a'}">${
                 estimateError === undefined
                   ? '未計算'
                   : `${estimateError > 0 ? '+' : ''}${estimateError}分`
-              }</p>
+              }</strong></p>
             </div>
 
             ${
               task.ifCondition || task.thenAction
                 ? `
                   <div class="ifthen-display">
-                    <strong style="display: block; margin-bottom: 8px; color: #1e40af;">If-Then</strong>
-                    <p style="margin: 0 0 6px 0;">If：${escapeHtml(task.ifCondition || '未設定')}</p>
-                    <p style="margin: 0;">Then：${escapeHtml(task.thenAction || '未設定')}</p>
+                    <strong style="display: block; font-size: 12px; color: #1e40af;">💡 If-Thenプラン</strong>
+                    <p><strong>If:</strong> ${escapeHtml(task.ifCondition || '未設定')}</p>
+                    <p><strong>Then:</strong> ${escapeHtml(task.thenAction || '未設定')}</p>
                   </div>
                 `
                 : ''
@@ -638,20 +859,20 @@
 
             ${
               task.tags && task.tags.length > 0
-                ? `<p style="margin-top: 16px; margin-bottom: 0;">${task.tags.map(tag => `<span style="color: #64748b; margin-right: 8px;">#${escapeHtml(tag)}</span>`).join('')}</p>`
+                ? `<div style="margin-top: 12px; display: flex; gap: 6px; flex-wrap: wrap;">${task.tags.map(tag => `<span style="font-size: 12px; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 6px;">#${escapeHtml(tag)}</span>`).join('')}</div>`
                 : ''
             }
 
             <div class="actions">
-              <button class="dark" onclick="startTask('${task.id}')">着手</button>
+              <button class="dark" onclick="startTask('${task.id}')">⏱️ 着手</button>
 
               ${
                 task.done
-                  ? `<button onclick="reopenTask('${task.id}')">未完了に戻す</button>`
-                  : `<button class="green" onclick="completeTask('${task.id}')">完了</button>`
+                  ? `<button onclick="reopenTask('${task.id}')">↩️ 戻す</button>`
+                  : `<button class="green" onclick="completeTask('${task.id}')">✅ 完了</button>`
               }
 
-              <button class="danger" onclick="removeTask('${task.id}')">削除</button>
+              <button class="danger" onclick="removeTask('${task.id}')">🗑️ 削除</button>
             </div>
           </article>
         `;
@@ -731,7 +952,8 @@
         .replaceAll("'", '&#039;');
     }
 
-    render();
+    // 初期化時はホームタブから表示
+    renderSummary();
   </script>
 </body>
 </html>
