@@ -17,44 +17,44 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background: #f8fafc;
       color: #0f172a;
-      line-height: 1.6;
+      line-height: 1.5;
       -webkit-tap-highlight-color: transparent;
-      padding-bottom: 80px; /* 下部タブバーと被らないように余白を確保 */
+      padding-bottom: 80px;
     }
 
     main {
       max-width: 600px;
       margin: 0 auto;
-      padding: 16px;
+      padding: 12px;
     }
 
     /* 各セクション（カード）の基本スタイル */
     .card {
       background: white;
-      border-radius: 24px;
-      padding: 20px;
-      margin-bottom: 16px;
+      border-radius: 20px;
+      padding: 14px;
+      margin-bottom: 12px;
       box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
       border: 1px solid rgba(241, 245, 249, 0.8);
     }
 
     h1 {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
-      margin: 0 0 8px;
+      margin: 0 0 6px;
       letter-spacing: -0.5px;
     }
 
     h2 {
-      font-size: 18px;
-      font-weight: 700;
-      margin: 0 0 16px;
-    }
-
-    h3 {
       font-size: 16px;
       font-weight: 700;
       margin: 0 0 12px;
+    }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 10px;
       line-height: 1.4;
     }
 
@@ -62,10 +62,10 @@
     input, select, button {
       width: 100%;
       box-sizing: border-box;
-      padding: 14px 16px;
-      border-radius: 16px;
+      padding: 10px 12px;
+      border-radius: 12px;
       border: 1.5px solid #e2e8f0;
-      font-size: 16px;
+      font-size: 15px;
       background: #f8fafc;
       color: #0f172a;
       font-family: inherit;
@@ -77,9 +77,9 @@
     select {
       background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
       background-repeat: no-repeat;
-      background-position: right 16px center;
-      background-size: 16px;
-      padding-right: 40px;
+      background-position: right 12px center;
+      background-size: 14px;
+      padding-right: 32px;
     }
 
     /* 見積もり時間入力 */
@@ -90,13 +90,13 @@
     }
 
     .input-with-unit input {
-      padding-right: 45px;
+      padding-right: 40px;
     }
 
     .input-with-unit .unit {
       position: absolute;
-      right: 16px;
-      font-size: 15px;
+      right: 12px;
+      font-size: 14px;
       font-weight: 600;
       color: #64748b;
       pointer-events: none;
@@ -111,11 +111,11 @@
 
     label {
       display: block;
-      margin-bottom: 6px;
-      font-size: 13px;
+      margin-bottom: 4px;
+      font-size: 12px;
       font-weight: 600;
       color: #64748b;
-      padding-left: 4px;
+      padding-left: 2px;
     }
 
     /* ボタン */
@@ -137,7 +137,7 @@
     .primary {
       background: #2563eb;
       color: white;
-      padding: 16px;
+      padding: 12px;
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
     }
     .primary:hover, .primary:active {
@@ -163,32 +163,32 @@
     /* グリッドシステム */
     .grid {
       display: grid;
-      gap: 12px;
+      gap: 8px;
     }
 
     .grid2 {
       grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      gap: 8px;
     }
 
     .grid4 {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      gap: 6px;
     }
 
     /* サマリー */
     .summary {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 10px;
+      margin-bottom: 12px;
     }
 
     .summary div {
       background: white;
-      border-radius: 20px;
-      padding: 16px;
+      border-radius: 16px;
+      padding: 12px;
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.02);
       border: 1px solid rgba(241, 245, 249, 0.8);
     }
@@ -196,15 +196,15 @@
     .summary p {
       margin: 0;
       color: #64748b;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
     }
 
     .summary strong {
       display: block;
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 800;
-      margin-top: 6px;
+      margin-top: 4px;
       color: #0f172a;
     }
 
@@ -223,14 +223,14 @@
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .badge {
       background: #f1f5f9;
-      padding: 4px 10px;
+      padding: 3px 8px;
       border-radius: 999px;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       color: #475569;
     }
@@ -238,13 +238,13 @@
     .info {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 12px 8px;
+      gap: 8px 6px;
       color: #475569;
-      font-size: 13px;
+      font-size: 12px;
       background: #f8fafc;
-      padding: 12px;
-      border-radius: 16px;
-      margin-bottom: 12px;
+      padding: 10px;
+      border-radius: 12px;
+      margin-bottom: 10px;
     }
 
     .info p {
@@ -257,40 +257,40 @@
 
     .ifthen-display {
       background: #eff6ff;
-      padding: 14px;
-      border-radius: 16px;
-      font-size: 13px;
+      padding: 10px;
+      border-radius: 12px;
+      font-size: 12px;
       border: 1px dashed #bfdbfe;
-      margin-top: 12px;
+      margin-top: 8px;
     }
 
     .ifthen-display p {
-      margin: 4px 0 0;
+      margin: 2px 0 0;
     }
 
     .actions {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 16px;
+      gap: 6px;
+      margin-top: 12px;
     }
 
     .actions button {
-      padding: 12px 8px;
-      font-size: 14px;
-      border-radius: 12px;
+      padding: 10px 6px;
+      font-size: 13px;
+      border-radius: 10px;
     }
 
     .form-item {
-      margin-bottom: 4px;
+      margin-bottom: 0px;
     }
 
     .ifthen-input-container {
       background: #eff6ff;
-      padding: 16px;
-      border-radius: 20px;
+      padding: 10px 12px;
+      border-radius: 16px;
       border: 1px solid #dbeafe;
-      margin-top: 12px;
+      margin-top: 4px;
     }
 
     /* タブ切り替え＆ボトムナビゲーション */
@@ -307,7 +307,7 @@
       bottom: 0;
       left: 0;
       right: 0;
-      height: 64px;
+      height: 60px;
       background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
@@ -325,11 +325,11 @@
       justify-content: center;
       background: none;
       border: none;
-      padding: 4px 0;
+      padding: 2px 0;
       width: 100%;
       height: 100%;
       color: #64748b;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       transition: color 0.15s ease;
       cursor: pointer;
@@ -340,8 +340,8 @@
     }
 
     .nav-item .icon {
-      font-size: 20px;
-      margin-bottom: 2px;
+      font-size: 18px;
+      margin-bottom: 1px;
       transition: transform 0.15s ease;
     }
 
@@ -350,7 +350,7 @@
     }
 
     .nav-item.active .icon {
-      transform: scale(1.15);
+      transform: scale(1.1);
     }
 
     @media (max-width: 360px) {
@@ -368,9 +368,9 @@
   <main>
     <section id="tab-home" class="tab-content active">
       <div class="card" style="text-align: center; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: none;">
-        <p style="color:#2563eb; font-weight:800; font-size: 12px; text-transform: uppercase; margin: 0 0 4px 0; letter-spacing: 1px;">卒業制作 試作版</p>
+        <p style="color:#2563eb; font-weight:800; font-size: 11px; text-transform: uppercase; margin: 0 0 4px 0; letter-spacing: 1px;">卒業制作 試作版</p>
         <h1>タスク管理Webアプリ</h1>
-        <p style="margin: 0; font-size: 13px; color: #475569;">
+        <p style="margin: 0; font-size: 12px; color: #475569;">
           見積もり時間と実績の誤差を確認し、時間管理の精度を上げましょう。
         </p>
       </div>
@@ -384,11 +384,11 @@
 
       <div class="card">
         <h2>📊 データ管理</h2>
-        <div class="grid" style="gap: 12px;">
-          <button onclick="exportCsv()" class="dark" style="padding: 16px;">📂 ログデータをCSV出力</button>
-          <div class="grid grid2" style="margin-top: 4px;">
-            <button onclick="clearDone()" style="font-size: 13px;">完了済を一括削除</button>
-            <button class="danger" onclick="clearAll()" style="font-size: 13px;">全データ削除</button>
+        <div class="grid" style="gap: 8px;">
+          <button onclick="exportCsv()" class="dark" style="padding: 12px;">📂 ログデータをCSV出力</button>
+          <div class="grid grid2" style="margin-top: 2px;">
+            <button onclick="clearDone()" style="font-size: 12px; padding: 10px;">完了済を一括削除</button>
+            <button class="danger" onclick="clearAll()" style="font-size: 12px; padding: 10px;">全データ削除</button>
           </div>
         </div>
       </div>
@@ -396,8 +396,6 @@
 
     <section id="tab-add" class="tab-content">
       <div class="card">
-        <h2>✍️ 新しいタスクを追加</h2>
-
         <div class="grid">
           <div class="form-item">
             <label>タスク名</label>
@@ -413,7 +411,7 @@
             <div>
               <label>見積もり時間</label>
               <div class="input-with-unit">
-                <input id="estimateInput" type="number" min="1" pattern="[0-9]*" inputmode="numeric" placeholder="例：30" />
+                <input id="estimateInput" type="number" min="1" pattern="\d*" inputmode="numeric" placeholder="例：30" />
                 <span class="unit">分</span>
               </div>
             </div>
@@ -447,27 +445,27 @@
           </div>
 
           <div class="ifthen-input-container form-item">
-            <strong style="display: block; margin-bottom: 10px; color: #1e40af; font-size: 14px;">If-Thenプラン（行動の習慣化）</strong>
+            <strong style="display: block; margin-bottom: 6px; color: #1e40af; font-size: 13px;">If-Thenプラン（行動の習慣化）</strong>
             <div class="grid grid2">
               <div>
-                <label style="color: #1e40af;">If（もし〜なら）</label>
-                <input id="ifInput" placeholder="例：授業が終わったら" style="background: white;" />
+                <label style="color: #1e40af; font-size: 11px;">If（もし〜なら）</label>
+                <input id="ifInput" placeholder="例：授業が完了したら" style="background: white;" />
               </div>
               <div>
-                <label style="color: #1e40af;">Then（そのとき〜する）</label>
+                <label style="color: #1e40af; font-size: 11px;">Then（そのとき〜する）</label>
                 <input id="thenInput" placeholder="例：図書館で30分進める" style="background: white;" />
               </div>
             </div>
           </div>
 
-          <button class="primary" onclick="addTask()">タスクを追加する</button>
+          <button class="primary" onclick="addTask()" style="margin-top: 8px;">タスクを追加する</button>
         </div>
       </div>
     </section>
 
     <section id="tab-list" class="tab-content">
-      <div class="card" style="background: #f1f5f9; padding: 16px;">
-        <div class="grid" style="gap: 12px;">
+      <div class="card" style="background: #f1f5f9; padding: 12px;">
+        <div class="grid" style="gap: 8px;">
           <input id="searchInput" placeholder="🔍 検索：タイトル・タグ・If-Then" oninput="render()" style="background: white;" />
 
           <div class="grid4">
@@ -487,7 +485,7 @@
               <option>その他</option>
             </select>
 
-            <button onclick="toggleDone()" id="doneToggleBtn" style="background-color: white; font-size: 13px; padding: 10px;">未完了のみ</button>
+            <button onclick="toggleDone()" id="doneToggleBtn" style="background-color: white; font-size: 12px; padding: 8px;">未完了のみ</button>
             <span style="display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #64748b;">タスク数: <span id="currentListCount" style="margin-left: 4px; color:#2563eb;">0</span></span>
           </div>
         </div>
@@ -517,7 +515,6 @@
     let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
     let showDone = false;
 
-    // タブ切り替え制御
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => {
         el.classList.remove('active');
@@ -569,7 +566,6 @@
       return Math.max(1, Math.round((task.completedAt - task.startedAt) / 60000));
     }
 
-    // タスク追加
     function addTask() {
       const title = document.getElementById('titleInput').value.trim();
       if (!title) {
@@ -818,7 +814,7 @@
               task.ifCondition || task.thenAction
                 ? `
                   <div class="ifthen-display">
-                    <strong style="display: block; font-size: 12px; color: #1e40af;">💡 If-Thenプラン</strong>
+                    <strong style="display: block; font-size: 11px; color: #1e40af;">💡 If-Thenプラン</strong>
                     <p><strong>If:</strong> ${escapeHtml(task.ifCondition || '未設定')}</p>
                     <p><strong>Then:</strong> ${escapeHtml(task.thenAction || '未設定')}</p>
                   </div>
@@ -828,7 +824,7 @@
 
             ${
               task.tags && task.tags.length > 0
-                ? `<div style="margin-top: 12px; display: flex; gap: 6px; flex-wrap: wrap;">${task.tags.map(tag => `<span style="font-size: 12px; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 6px;">#${escapeHtml(tag)}</span>`).join('')}</div>`
+                ? `<div style="margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap;">${task.tags.map(tag => `<span style="font-size: 11px; color: #64748b; background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">#${escapeHtml(tag)}</span>`).join('')}</div>`
                 : ''
             }
 
@@ -921,7 +917,6 @@
         .replaceAll("'", '&#039;');
     }
 
-    // 🆕 Service Worker（sw.js）の登録処理
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js')
