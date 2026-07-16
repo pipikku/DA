@@ -2,406 +2,958 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>タスク管理Webアプリ</title>
-  
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#2563eb" />
-  
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link class="apple-touch-icon" href="icon-192.png" />
-  
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
-  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png" />
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    /* 基本モバイルファースト設計 */
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      line-height: 1.6;
+      -webkit-tap-highlight-color: transparent;
+      padding-bottom: 80px; /* 下部タブバーと被らないように余白を確保 */
+    }
+
+    main {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* 各セクション（カード）の基本スタイル */
+    .card {
+      background: white;
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(241, 245, 249, 0.8);
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 800;
+      margin: 0 0 8px;
+      letter-spacing: -0.5px;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 16px;
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0 0 12px;
+      line-height: 1.4;
+    }
+
+    /* フォーム要素 */
+    input, select, button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1.5px solid #e2e8f0;
+      font-size: 16px;
+      background: #f8fafc;
+      color: #0f172a;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 16px;
+      padding-right: 40px;
+    }
+
+    /* 見積もり時間入力 */
+    .input-with-unit {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-with-unit input {
+      padding-right: 45px;
+    }
+
+    .input-with-unit .unit {
+      position: absolute;
+      right: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #64748b;
+      pointer-events: none;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #2563eb;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      padding-left: 4px;
+    }
+
+    /* ボタン */
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      background: #f1f5f9;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .primary {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+    .primary:hover, .primary:active {
+      background: #1d4ed8;
+    }
+
+    .dark {
+      background: #0f172a;
+      color: white;
+    }
+
+    .green {
+      background: #10b981;
+      color: white;
+    }
+
+    .danger {
+      color: #ef4444;
+      background: #fef2f2;
+      border: 1px solid #fee2e2;
+    }
+
+    /* グリッドシステム */
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .grid2 {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .grid4 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    /* サマリー */
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .summary div {
+      background: white;
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.02);
+      border: 1px solid rgba(241, 245, 249, 0.8);
+    }
+
+    .summary p {
+      margin: 0;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .summary strong {
+      display: block;
+      font-size: 24px;
+      font-weight: 800;
+      margin-top: 6px;
+      color: #0f172a;
+    }
+
+    /* タスクカード */
+    .task {
+      border-left: 6px solid #2563eb;
+      position: relative;
+    }
+
+    .task.done {
+      opacity: 0.6;
+      border-left-color: #94a3b8;
+    }
+
+    .badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .badge {
+      background: #f1f5f9;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    .info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px 8px;
+      color: #475569;
+      font-size: 13px;
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+    }
+
+    .info p {
+      margin: 0;
+    }
+
+    .info strong {
+      color: #0f172a;
+    }
+
+    .ifthen-display {
+      background: #eff6ff;
+      padding: 14px;
+      border-radius: 16px;
+      font-size: 13px;
+      border: 1px dashed #bfdbfe;
+      margin-top: 12px;
+    }
+
+    .ifthen-display p {
+      margin: 4px 0 0;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .actions button {
+      padding: 12px 8px;
+      font-size: 14px;
+      border-radius: 12px;
+    }
+
+    .form-item {
+      margin-bottom: 4px;
+    }
+
+    .ifthen-input-container {
+      background: #eff6ff;
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid #dbeafe;
+      margin-top: 12px;
+    }
+
+    /* ==========================================
+       🆕 タブ切り替え＆ボトムナビゲーションのスタイル
+       ========================================== */
+    
+    /* 初期状態ですべてのタブコンテンツを非表示に */
+    .tab-content {
+      display: none;
+    }
+
+    /* activeクラスがついているタブコンテンツだけを表示 */
+    .tab-content.active {
+      display: block;
+    }
+
+    /* 画面下部固定のナビゲーションバー */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px); /* おしゃれなすりガラス効果 */
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(226, 232, 240, 0.8);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* 3つの等幅タブ */
+      z-index: 1000;
+      padding-bottom: env(safe-area-inset-bottom); /* iPhone等のノッチ回避用の余白 */
+    }
+
+    /* 各タブボタンの装飾 */
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      padding: 4px 0;
+      width: 100%;
+      height: 100%;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 700;
+      transition: color 0.15s ease;
+      cursor: pointer;
+    }
+
+    .nav-item:active {
+      transform: none; /* タブは凹むアニメーションを無効化して滑らかに */
+    }
+
+    .nav-item .icon {
+      font-size: 20px;
+      margin-bottom: 2px;
+      transition: transform 0.15s ease;
+    }
+
+    /* アクティブ（現在開いている）タブのスタイル */
+    .nav-item.active {
+      color: #2563eb;
+    }
+
+    .nav-item.active .icon {
+      transform: scale(1.15); /* アクティブなアイコンを少し大きく */
+    }
+
+    /* レスポンシブ微調整（超小型スマホ向け） */
+    @media (max-width: 360px) {
+      .actions {
+        grid-template-columns: 1fr;
+      }
+      .grid4 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen pb-16">
 
-  <header class="bg-white border-b border-slate-100 py-6 px-4 mb-6 shadow-sm">
-    <div class="max-w-md mx-auto text-center">
-      <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">卒業制作 試作版</span>
-      <h1 class="text-2xl font-bold mt-2 text-slate-900">タスク管理Webアプリ</h1>
-      <p class="text-xs text-slate-500 mt-1">見積もり時間と実績の誤差を確認し、時間管理の精度を上げましょう。</p>
-    </div>
-  </header>
-
-  <main class="max-w-md mx-auto px-4 space-y-6">
-
-    <section class="grid grid-cols-2 gap-3">
-      <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm text-center">
-        <span class="text-xs text-slate-400 block mb-1">総タスク</span>
-        <span id="total-tasks" class="text-2xl font-black text-slate-800">0</span>
+<body>
+  <main>
+    <!-- ==========================================
+         🏠 タブ1: ホーム（ダッシュボード＆管理）
+         ========================================== -->
+    <section id="tab-home" class="tab-content active">
+      <div class="card" style="text-align: center; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: none;">
+        <p style="color:#2563eb; font-weight:800; font-size: 12px; text-transform: uppercase; margin: 0 0 4px 0; letter-spacing: 1px;">卒業制作 試作版</p>
+        <h1>タスク管理Webアプリ</h1>
+        <p style="margin: 0; font-size: 13px; color: #475569;">
+          見積もり時間と実績の誤差を確認し、時間管理の精度を上げましょう。
+        </p>
       </div>
-      <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm text-center">
-        <span class="text-xs text-slate-400 block mb-1">着手率</span>
-        <span id="progress-rate" class="text-2xl font-black text-slate-800">0%</span>
-      </div>
-      <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm text-center">
-        <span class="text-xs text-slate-400 block mb-1">完了率</span>
-        <span id="completion-rate" class="text-2xl font-black text-slate-800">0%</span>
-      </div>
-      <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm text-center">
-        <span class="text-xs text-slate-400 block mb-1">平均見積もり誤差</span>
-        <span id="avg-error" class="text-2xl font-black text-slate-800">-</span>
-      </div>
-    </section>
 
-    <section class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-      <h2 class="text-sm font-bold text-slate-700 flex items-items justify-between">
-        <span>➕ タスクを追加</span>
-      </h2>
-      
-      <div class="space-y-3">
-        <div>
-          <label class="text-xs font-semibold text-slate-400 block mb-1">タスク名</label>
-          <input id="task-title" type="text" placeholder="例: 卒制の背景部分を書く" 
-            class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" />
-        </div>
+      <!-- サマリー統計エリア -->
+      <div class="summary">
+        <div><p>総タスク</p><strong id="totalCount">0</strong></div>
+        <div><p>着手率</p><strong id="startRate">0%</strong></div>
+        <div><p>完了率</p><strong id="completeRate">0%</strong></div>
+        <div><p>平均誤差</p><strong id="averageError">-</strong></div>
+      </div>
 
-        <div>
-          <label class="text-xs font-semibold text-slate-400 block mb-1">見積もり時間（分）</label>
-          <div class="relative">
-            <input id="task-est" type="number" pattern="\d*" inputmode="numeric" placeholder="例: 45" 
-              class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" />
-            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">分</span>
+      <!-- データ管理（CSV出力・データリセット） -->
+      <div class="card">
+        <h2>📊 データ管理</h2>
+        <div class="grid" style="gap: 12px;">
+          <button onclick="exportCsv()" class="dark" style="padding: 16px;">📂 ログデータをCSV出力</button>
+          <div class="grid grid2" style="margin-top: 4px;">
+            <button onclick="clearDone()" style="font-size: 13px;">完了済を一括削除</button>
+            <button class="danger" onclick="clearAll()" style="font-size: 13px;">全データ削除</button>
           </div>
         </div>
-
-        <button id="add-task-btn" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-md shadow-slate-900/10">
-          タスクを保存する
-        </button>
       </div>
     </section>
 
-    <section class="space-y-3">
-      <h2 class="text-sm font-bold text-slate-700">📋 タスク一覧</h2>
-      <div id="task-list" class="space-y-3">
+
+    <!-- ==========================================
+         ➕ タブ2: タスク追加
+         ========================================== -->
+    <section id="tab-add" class="tab-content">
+      <div class="card">
+        <h2>✍️ 新しいタスクを追加</h2>
+
+        <div class="grid">
+          <div class="form-item">
+            <label>タスク名</label>
+            <input id="titleInput" placeholder="例：卒論の背景を書く" />
+          </div>
+
+          <div class="grid grid2 form-item">
+            <div>
+              <label>期限</label>
+              <input id="dueInput" type="date" />
+            </div>
+
+            <div>
+              <label>見積もり時間</label>
+              <div class="input-with-unit">
+                <input id="estimateInput" type="number" min="1" pattern="[0-9]*" inputmode="numeric" placeholder="例：30" />
+                <span class="unit">分</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid2 form-item">
+            <div>
+              <label>カテゴリ</label>
+              <select id="categoryInput">
+                <option>課題</option>
+                <option>自習</option>
+                <option>アルバイト</option>
+                <option>トレーニング</option>
+                <option>その他</option>
+              </select>
+            </div>
+
+            <div>
+              <label>優先度</label>
+              <select id="priorityInput">
+                <option>高</option>
+                <option selected>中</option>
+                <option>低</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-item">
+            <label>タグ・メモ</label>
+            <input id="tagsInput" placeholder="例：レポート, 重要 (カンマ区切り)" />
+          </div>
+
+          <div class="ifthen-input-container form-item">
+            <strong style="display: block; margin-bottom: 10px; color: #1e40af; font-size: 14px;">If-Thenプラン（行動の習慣化）</strong>
+            <div class="grid grid2">
+              <div>
+                <label style="color: #1e40af;">If（もし〜なら）</label>
+                <input id="ifInput" placeholder="例：授業が終わったら" style="background: white;" />
+              </div>
+              <div>
+                <label style="color: #1e40af;">Then（そのとき〜する）</label>
+                <input id="thenInput" placeholder="例：図書館で30分進める" style="background: white;" />
+              </div>
+            </div>
+          </div>
+
+          <button class="primary" onclick="addTask()">タスクを追加する</button>
         </div>
-    </section>
-
-    <section class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-      <h2 class="text-sm font-bold text-slate-700 flex items-center gap-2">
-        📊 データ管理
-      </h2>
-      <div class="grid grid-cols-2 gap-3">
-        <button id="export-btn" class="flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-100 text-slate-700 font-bold py-3 rounded-xl text-xs transition-all">
-          <i class="fa-solid fa-download text-slate-400"></i> バックアップ保存
-        </button>
-        <button id="import-btn" class="flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-100 text-slate-700 font-bold py-3 rounded-xl text-xs transition-all">
-          <i class="fa-solid fa-upload text-slate-400"></i> バックアップ復元
-        </button>
       </div>
-      <button id="clear-all-btn" class="w-full bg-rose-50 hover:bg-rose-100 border border-rose-100 text-rose-600 font-bold py-3 rounded-xl text-xs transition-all">
-        <i class="fa-solid fa-trash-can mr-1"></i> すべてのデータを削除
-      </button>
     </section>
 
+
+    <!-- ==========================================
+         🔍 タブ3: タスク一覧（検索・表示）
+         ========================================== -->
+    <section id="tab-list" class="tab-content">
+      <!-- 検索＆フィルター操作パネル -->
+      <div class="card" style="background: #f1f5f9; padding: 16px;">
+        <div class="grid" style="gap: 12px;">
+          <input id="searchInput" placeholder="🔍 検索：タイトル・タグ・If-Then" oninput="render()" style="background: white;" />
+
+          <div class="grid4">
+            <select id="sortInput" onchange="render()" style="background-color: white;">
+              <option value="due">📅 期限順</option>
+              <option value="new">🆕 新しい順</option>
+              <option value="old">⏳ 古い順</option>
+              <option value="priority">🔥 優先度順</option>
+            </select>
+
+            <select id="categoryFilter" onchange="render()" style="background-color: white;">
+              <option value="all">📁 すべてカテゴリ</option>
+              <option>課題</option>
+              <option>自習</option>
+              <option>アルバイト</option>
+              <option>トレーニング</option>
+              <option>その他</option>
+            </select>
+
+            <button onclick="toggleDone()" id="doneToggleBtn" style="background-color: white; font-size: 13px; padding: 10px;">未完了のみ</button>
+            <span style="display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #64748b;">タスク数: <span id="currentListCount" style="margin-left: 4px; color:#2563eb;">0</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- タスク一覧表示領域 -->
+      <div id="taskList"></div>
+    </section>
   </main>
 
-  <div id="complete-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in duration-150">
-      <div class="text-center">
-        <span class="text-2xl">🎉</span>
-        <h3 class="text-lg font-bold text-slate-800 mt-2">お疲れ様でした！</h3>
-        <p class="text-xs text-slate-400 mt-1">実際にかかった時間を入力しましょう。</p>
-      </div>
-      
-      <div>
-        <label class="text-xs font-semibold text-slate-400 block mb-1">実績時間（分）</label>
-        <div class="relative">
-          <input id="modal-real" type="number" pattern="\d*" inputmode="numeric" placeholder="例: 40" 
-            class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" />
-          <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">分</span>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-3 pt-2">
-        <button id="modal-cancel-btn" class="bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold py-3 rounded-xl text-sm transition-all">
-          キャンセル
-        </button>
-        <button id="modal-submit-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-md shadow-blue-600/10">
-          完了を記録
-        </button>
-      </div>
-    </div>
-  </div>
+  <!-- ==========================================
+       📱 画面最下部固定のタブナビゲーションバー
+       ========================================== -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('home')" id="nav-home">
+      <span class="icon">🏠</span>
+      <span>ホーム</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('add')" id="nav-add">
+      <span class="icon">➕</span>
+      <span>タスク追加</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('list')" id="nav-list">
+      <span class="icon">🔍</span>
+      <span>タスク一覧</span>
+    </button>
+  </nav>
 
   <script>
-    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    let activeTaskIndex = null;
+    const STORAGE_KEY = 'graduation_task_app_html_v1';
+    let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    let showDone = false;
 
-    // 要素の取得
-    const taskTitleInput = document.getElementById('task-title');
-    const taskEstInput = document.getElementById('task-est');
-    const addTaskBtn = document.getElementById('add-task-btn');
-    const taskList = document.getElementById('task-list');
+    // ==========================================
+    // 🆕 タブ切り替え制御関数
+    // ==========================================
+    function switchTab(tabName) {
+      // 全てのコンテンツエリアを非表示にする
+      document.querySelectorAll('.tab-content').forEach(el => {
+        el.classList.remove('active');
+      });
+      // 全てのナビボタンのアクティブ表示をリセット
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.remove('active');
+      });
 
-    // モーダルの要素
-    const completeModal = document.getElementById('complete-modal');
-    const modalRealInput = document.getElementById('modal-real');
-    const modalCancelBtn = document.getElementById('modal-cancel-btn');
-    const modalSubmitBtn = document.getElementById('modal-submit-btn');
+      // 対象のタブとナビボタンをアクティブにする
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+      document.getElementById(`nav-${tabName}`).classList.add('active');
 
-    // 統計の要素
-    const totalTasksSpan = document.getElementById('total-tasks');
-    const progressRateSpan = document.getElementById('progress-rate');
-    const completionRateSpan = document.getElementById('completion-rate');
-    const avgErrorSpan = document.getElementById('avg-error');
+      // 画面を最上部までスクロール
+      window.scrollTo({ top: 0, behavior: 'instant' });
 
-    // データ管理要素
-    const exportBtn = document.getElementById('export-btn');
-    const importBtn = document.getElementById('import-btn');
-    const clearAllBtn = document.getElementById('clear-all-btn');
-
-    // 初期化
-    document.addEventListener('DOMContentLoaded', () => {
-      renderTasks();
-      updateStats();
-    });
-
-    function saveToLocalStorage() {
-      localStorage.setItem('tasks', JSON.stringify(tasks));
-      updateStats();
-    }
-
-    function updateStats() {
-      const total = tasks.length;
-      totalTasksSpan.textContent = total;
-
-      if (total === 0) {
-        progressRateSpan.textContent = "0%";
-        completionRateSpan.textContent = "0%";
-        avgErrorSpan.textContent = "-";
-        return;
-      }
-
-      const inProgress = tasks.filter(t => t.status === 'progress' || t.status === 'completed').length;
-      const completedTasks = tasks.filter(t => t.status === 'completed');
-      const completedCount = completedTasks.length;
-
-      progressRateSpan.textContent = `${Math.round((inProgress / total) * 100)}%`;
-      completionRateSpan.textContent = `${Math.round((completedCount / total) * 100)}%`;
-
-      if (completedCount === 0) {
-        avgErrorSpan.textContent = "-";
-      } else {
-        let totalError = 0;
-        completedTasks.forEach(t => {
-          totalError += Math.abs(t.real - t.est);
-        });
-        const avg = Math.round(totalError / completedCount);
-        avgErrorSpan.textContent = `${avg}分`;
+      // リストタブが選択された場合は再レンダリング
+      if (tabName === 'list') {
+        render();
       }
     }
 
-    addTaskBtn.addEventListener('click', () => {
-      const title = taskTitleInput.value.trim();
-      const est = parseInt(taskEstInput.value, 10);
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    }
 
+    function uid() {
+      return Date.now().toString() + Math.random().toString(16).slice(2);
+    }
+
+    function formatMinutes(min) {
+      if (!min) return '未記録';
+      const h = Math.floor(min / 60);
+      const m = min % 60;
+      if (h === 0) return `${m}分`;
+      if (m === 0) return `${h}時間`;
+      return `${h}時間${m}分`;
+    }
+
+    function formatJST(timestamp) {
+      if (!timestamp) return '未記録';
+      return new Intl.DateTimeFormat('ja-JP', {
+        timeZone: 'Asia/Tokyo',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(new Date(timestamp));
+    }
+
+    function getActualMinutes(task) {
+      if (!task.startedAt || !task.completedAt) return undefined;
+      return Math.max(1, Math.round((task.completedAt - task.startedAt) / 60000));
+    }
+
+    // タスク追加処理
+    function addTask() {
+      const title = document.getElementById('titleInput').value.trim();
       if (!title) {
         alert('タスク名を入力してください。');
         return;
       }
-      if (!est || est <= 0) {
-        alert('正しい見積もり時間を入力してください。');
-        return;
-      }
 
-      tasks.push({
+      const tagsText = document.getElementById('tagsInput').value;
+      const rawEstimate = document.getElementById('estimateInput').value;
+
+      const task = {
+        id: uid(),
         title,
-        est,
-        real: null,
-        status: 'todo'
-      });
-
-      taskTitleInput.value = '';
-      taskEstInput.value = '';
-      saveToLocalStorage();
-      renderTasks();
-    });
-
-    function renderTasks() {
-      taskList.innerHTML = '';
-
-      if (tasks.length === 0) {
-        taskList.innerHTML = `
-          <div class="text-center py-8 text-slate-400 text-xs">
-            <i class="fa-regular fa-clipboard text-2xl mb-2 block"></i>
-            タスクが登録されていません
-          </div>
-        `;
-        return;
-      }
-
-      tasks.forEach((task, index) => {
-        const card = document.createElement('div');
-        card.className = `p-4 rounded-2xl border transition-all ${
-          task.status === 'completed' 
-            ? 'bg-slate-100/60 border-slate-100 text-slate-400' 
-            : 'bg-white border-slate-100 shadow-sm'
-        }`;
-
-        let badge = '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">未着手</span>';
-        let actionButton = `
-          <button onclick="startTask(${index})" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-xl text-xs transition-all">
-            <i class="fa-solid fa-play mr-1 text-slate-400"></i> 着手
-          </button>
-        `;
-
-        if (task.status === 'progress') {
-          badge = '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">進行中</span>';
-          actionButton = `
-            <button onclick="openCompleteModal(${index})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs transition-all shadow-md shadow-blue-600/15">
-              <i class="fa-solid fa-check mr-1"></i> 完了
-            </button>
-          `;
-        } else if (task.status === 'completed') {
-          badge = '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">完了</span>';
-          const error = task.real - task.est;
-          const errorText = error === 0 
-            ? "ピッタリ！" 
-            : error > 0 ? `＋${error}分超過` : `－${Math.abs(error)}分短縮`;
-          
-          actionButton = `
-            <div class="text-[11px] text-slate-400 flex items-center gap-1.5 font-medium">
-              <span>実績: <strong>${task.real}分</strong></span>
-              <span class="text-slate-300">|</span>
-              <span class="${error > 0 ? 'text-amber-500 font-bold' : 'text-emerald-500 font-bold'}">${errorText}</span>
-            </div>
-          `;
-        }
-
-        card.innerHTML = `
-          <div class="flex items-start justify-between gap-4">
-            <div class="space-y-1">
-              <div class="flex items-center gap-2 flex-wrap">
-                ${badge}
-                <span class="text-xs text-slate-400 font-medium">見積: <strong>${task.est}分</strong></span>
-              </div>
-              <p class="font-bold text-sm ${task.status === 'completed' ? 'line-through text-slate-400' : 'text-slate-800'}">${task.title}</p>
-            </div>
-            <button onclick="deleteTask(${index})" class="text-slate-300 hover:text-rose-500 p-1 transition-all">
-              <i class="fa-regular fa-trash-can text-sm"></i>
-            </button>
-          </div>
-          <div class="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between">
-            ${actionButton}
-          </div>
-        `;
-
-        taskList.appendChild(card);
-      });
-    }
-
-    window.startTask = function(index) {
-      tasks[index].status = 'progress';
-      saveToLocalStorage();
-      renderTasks();
-    };
-
-    window.openCompleteModal = function(index) {
-      activeTaskIndex = index;
-      modalRealInput.value = tasks[index].est;
-      completeModal.classList.remove('hidden');
-      modalRealInput.focus();
-    };
-
-    modalCancelBtn.addEventListener('click', () => {
-      completeModal.classList.add('hidden');
-      activeTaskIndex = null;
-    });
-
-    modalSubmitBtn.addEventListener('click', () => {
-      const real = parseInt(modalRealInput.value, 10);
-      if (!real || real <= 0) {
-        alert('実績時間を正しく入力してください。');
-        return;
-      }
-
-      if (activeTaskIndex !== null) {
-        tasks[activeTaskIndex].real = real;
-        tasks[activeTaskIndex].status = 'completed';
-        saveToLocalStorage();
-        renderTasks();
-        completeModal.classList.add('hidden');
-        activeTaskIndex = null;
-      }
-    });
-
-    window.deleteTask = function(index) {
-      if (confirm('このタスクを削除しますか？')) {
-        tasks.splice(index, 1);
-        saveToLocalStorage();
-        renderTasks();
-      }
-    };
-
-    exportBtn.addEventListener('click', () => {
-      if (tasks.length === 0) {
-        alert('保存するデータがありません。');
-        return;
-      }
-      const dataStr = JSON.stringify(tasks, null, 2);
-      const blob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `task_backup_${new Date().toISOString().slice(0,10)}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
-
-    importBtn.addEventListener('click', () => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '.json';
-      input.onchange = e => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = event => {
-          try {
-            const importedTasks = JSON.parse(event.target.result);
-            if (Array.isArray(importedTasks)) {
-              if (confirm('既存のタスクデータを上書きしてバックアップを復元しますか？')) {
-                tasks = importedTasks;
-                saveToLocalStorage();
-                renderTasks();
-                alert('復元が成功しました！');
-              }
-            } else {
-              alert('不正なバックアップ形式ファイルです。');
-            }
-          } catch (err) {
-            alert('ファイルの読み込みに失敗しました。');
-          }
-        };
-        reader.readAsText(file);
+        done: false,
+        createdAt: Date.now(),
+        due: document.getElementById('dueInput').value || '',
+        category: document.getElementById('categoryInput').value,
+        priority: document.getElementById('priorityInput').value,
+        tags: tagsText.split(',').map(t => t.trim()).filter(Boolean),
+        estimateMin: rawEstimate ? Number(rawEstimate) : undefined,
+        ifCondition: document.getElementById('ifInput').value.trim(),
+        thenAction: document.getElementById('thenInput').value.trim()
       };
-      input.click();
-    });
 
-    clearAllBtn.addEventListener('click', () => {
-      if (confirm('これまでのすべてのデータ（タスク履歴、統計情報）が完全に削除されます。よろしいですか？')) {
-        tasks = [];
-        saveToLocalStorage();
-        renderTasks();
-        alert('すべてのデータをリセットしました。');
+      tasks.unshift(task);
+      save();
+      clearForm();
+      
+      // 保存したあと「🔍 タスク一覧」タブへ自動で画面を切り替えてリストを更新する
+      switchTab('list');
+    }
+
+    function clearForm() {
+      document.getElementById('titleInput').value = '';
+      document.getElementById('dueInput').value = '';
+      document.getElementById('categoryInput').value = '課題';
+      document.getElementById('priorityInput').value = '中';
+      document.getElementById('tagsInput').value = '';
+      document.getElementById('estimateInput').value = '';
+      document.getElementById('ifInput').value = '';
+      document.getElementById('thenInput').value = '';
+    }
+
+    function startTask(id) {
+      tasks = tasks.map(task => {
+        if (task.id === id && !task.startedAt) {
+          return { ...task, startedAt: Date.now() };
+        }
+        return task;
+      });
+
+      save();
+      render();
+    }
+
+    function completeTask(id) {
+      const now = Date.now();
+
+      tasks = tasks.map(task => {
+        if (task.id === id) {
+          return {
+            ...task,
+            done: true,
+            startedAt: task.startedAt || now,
+            completedAt: now
+          };
+        }
+        return task;
+      });
+
+      save();
+      render();
+    }
+
+    function reopenTask(id) {
+      tasks = tasks.map(task => {
+        if (task.id === id) {
+          return {
+            ...task,
+            done: false,
+            completedAt: undefined
+          };
+        }
+        return task;
+      });
+
+      save();
+      render();
+    }
+
+    function removeTask(id) {
+      if (!confirm('このタスクを削除しますか？')) return;
+      tasks = tasks.filter(task => task.id !== id);
+      save();
+      render();
+    }
+
+    function toggleDone() {
+      showDone = !showDone;
+      document.getElementById('doneToggleBtn').textContent =
+        showDone ? '🟢 全て表示中' : '🔵 未完了表示中';
+      render();
+    }
+
+    function clearDone() {
+      if (!confirm('完了済みタスクを一括削除しますか？')) return;
+      tasks = tasks.filter(task => !task.done);
+      save();
+      renderSummary();
+      render();
+    }
+
+    function clearAll() {
+      if (!confirm('全データを削除しますか？\n(注意: ローカルストレージ内のこのアプリの全データが失われます)')) return;
+      tasks = [];
+      save();
+      renderSummary();
+      render();
+    }
+
+    function priorityScore(priority) {
+      if (priority === '高') return 3;
+      if (priority === '中') return 2;
+      return 1;
+    }
+
+    function getFilteredTasks() {
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const category = document.getElementById('categoryFilter').value;
+      const sort = document.getElementById('sortInput').value;
+
+      let list = [...tasks];
+
+      if (query) {
+        list = list.filter(task => {
+          const text = [
+            task.title,
+            task.category,
+            task.priority,
+            task.ifCondition || '',
+            task.thenAction || '',
+            ...(task.tags || [])
+          ].join(' ').toLowerCase();
+
+          return text.includes(query);
+        });
       }
-    });
 
-    // Service Workerの登録
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('Service Worker 登録成功:', reg))
-          .catch(err => console.error('Service Worker 登録失敗:', err));
+      if (category !== 'all') {
+        list = list.filter(task => task.category === category);
+      }
+
+      if (!showDone) {
+        list = list.filter(task => !task.done);
+      }
+
+      if (sort === 'due') {
+        list.sort((a, b) => (a.due || '9999-12-31').localeCompare(b.due || '9999-12-31'));
+      }
+
+      if (sort === 'new') {
+        list.sort((a, b) => b.createdAt - a.createdAt);
+      }
+
+      if (sort === 'old') {
+        list.sort((a, b) => a.createdAt - b.createdAt);
+      }
+
+      if (sort === 'priority') {
+        list.sort((a, b) => priorityScore(b.priority) - priorityScore(a.priority));
+      }
+
+      return list;
+    }
+
+    function renderSummary() {
+      const total = tasks.length;
+      const started = tasks.filter(task => task.startedAt).length;
+      const done = tasks.filter(task => task.done).length;
+
+      const startRate = total === 0 ? 0 : Math.round((started / total) * 100);
+      const completeRate = total === 0 ? 0 : Math.round((done / total) * 100);
+
+      const errorTargets = tasks.filter(task => task.estimateMin && getActualMinutes(task));
+
+      let averageError = '-';
+
+      if (errorTargets.length > 0) {
+        const sum = errorTargets.reduce((total, task) => {
+          const actualMin = getActualMinutes(task);
+          return total + Math.abs(actualMin - task.estimateMin);
+        }, 0);
+
+        averageError = Math.round(sum / errorTargets.length) + '分';
+      }
+
+      document.getElementById('totalCount').textContent = total;
+      document.getElementById('startRate').textContent = startRate + '%';
+      document.getElementById('completeRate').textContent = completeRate + '%';
+      document.getElementById('averageError').textContent = averageError;
+    }
+
+    function render() {
+      renderSummary();
+
+      const taskList = document.getElementById('taskList');
+      const list = getFilteredTasks();
+
+      // 現在の一覧画面の表示タスク数を更新
+      document.getElementById('currentListCount').textContent = list.length;
+
+      if (list.length === 0) {
+        taskList.innerHTML = '<div class="card" style="text-align: center; color: #64748b; font-size: 14px; padding: 32px 16px;">該当するタスクがありません。</div>';
+        return;
+      }
+
+      taskList.innerHTML = list.map(task => {
+        const actualMin = getActualMinutes(task);
+        const estimateError =
+          task.estimateMin && actualMin !== undefined
+            ? actualMin - task.estimateMin
+            : undefined;
+
+        return `
+          <article class="card task ${task.done ? 'done' : ''}">
+            <div class="badges">
+              <span class="badge" style="background: #eff6ff; color: #2563eb;">${task.category}</span>
+              <span class="badge" style="background: ${task.priority === '高' ? '#fef2f2; color: #ef4444;' : '#f8fafc; color: #475569;'}">優先度：${task.priority}</span>
+              ${task.done ? '<span class="badge" style="background: #d1fae5; color: #065f46;">✅ 完了</span>' : ''}
+            </div>
+
+            <h3>${escapeHtml(task.title)}</h3>
+
+            <div class="info">
+              <p>期限: <strong>${task.due || 'なし'}</strong></p>
+              <p>見積: <strong>${formatMinutes(task.estimateMin)}</strong></p>
+              <p>着手: <strong>${task.startedAt ? formatJST(task.startedAt) : '未記録'}</strong></p>
+              <p>完了: <strong>${task.completedAt ? formatJST(task.completedAt) : '未記録'}</strong></p>
+              <p>実績: <strong>${formatMinutes(actualMin)}</strong></p>
+              <p>誤差: <strong style="color: ${estimateError > 0 ? '#ef4444' : estimateError < 0 ? '#2563eb' : '#0f172a'}">${
+                estimateError === undefined
+                  ? '未計算'
+                  : `${estimateError > 0 ? '+' : ''}${estimateError}分`
+              }</strong></p>
+            </div>
+
+            ${
+              task.ifCondition || task.thenAction
+                ? `
+                  <div class="ifthen-display">
+                    <strong style="display: block; font-size: 12px; color: #1e40af;">💡 If-Thenプラン</strong>
+                    <p><strong>If:</strong> ${escapeHtml(task.ifCondition || '未設定')}</p>
+                    <p><strong>Then:</strong> ${escapeHtml(task.thenAction || '未設定')}</p>
+                  </div>
+                `
+                : ''
+            }
+
+            ${
+              task.tags && task.tags.length > 0
+                ? `<div style="margin-top: 12px; display: flex; gap: 6px; flex-wrap: wrap;">${task.tags.map(tag => `<span style="font-size: 12px; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 6px;">#${escapeHtml(tag)}</span>`).join('')}</div>`
+                : ''
+            }
+
+            <div class="actions">
+              <button class="dark" onclick="startTask('${task.id}')">⏱️ 着手</button>
+
+              ${
+                task.done
+                  ? `<button onclick="reopenTask('${task.id}')">↩️ 戻す</button>`
+                  : `<button class="green" onclick="completeTask('${task.id}')">✅ 完了</button>`
+              }
+
+              <button class="danger" onclick="removeTask('${task.id}')">🗑️ 削除</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function buildCsvData() {
+      return tasks.map(task => {
+        const actualMin = getActualMinutes(task);
+        const estimateError =
+          task.estimateMin && actualMin !== undefined
+            ? actualMin - task.estimateMin
+            : undefined;
+
+        return {
+          タスク名: task.title,
+          見積もり時間_分: task.estimateMin || '',
+          実際の作業時間_分: actualMin || '',
+          見積もりとの差_分: estimateError ?? '',
+          絶対誤差_分: estimateError === undefined ? '' : Math.abs(estimateError),
+          作成日時_日本時間: formatJST(task.createdAt),
+          着手日時_日本時間: formatJST(task.startedAt),
+          完了日時_日本時間: formatJST(task.completedAt)
+        };
       });
     }
+
+    function exportCsv() {
+      if (tasks.length === 0) {
+        alert('出力するログがありません。');
+        return;
+      }
+
+      const headers = [
+        'タスク名',
+        '見積もり時間_分',
+        '実際の作業時間_分',
+        '見積もりとの差_分',
+        '絶対誤差_分',
+        '作成日時_日本時間',
+        '着手日時_日本時間',
+        '完了日時_日本時間'
+      ];
+
+      const rows = buildCsvData();
+
+      const csvRows = [
+        headers.join(','),
+        ...rows.map(row =>
+          headers.map(header => {
+            const value = row[header] ?? '';
+            return `"${String(value).replace(/"/g, '""')}"`;
+          }).join(',')
+        )
+      ];
+
+      const csvText = '\uFEFF' + csvRows.join('\r\n');
+      const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'task-log.csv';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      URL.revokeObjectURL(url);
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    // 初期化時はホームタブから表示
+    renderSummary();
   </script>
 </body>
 </html>
