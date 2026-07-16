@@ -10,7 +10,7 @@
   
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link class="apple-touch-icon" href="icon-192.png" />
   
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png" />
@@ -129,8 +129,271 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
   <script>
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    let activeTaskIndex = null;
+
+    // 要素の取得
+    const taskTitleInput = document.getElementById('task-title');
+    const taskEstInput = document.getElementById('task-est');
+    const addTaskBtn = document.getElementById('add-task-btn');
+    const taskList = document.getElementById('task-list');
+
+    // モーダルの要素
+    const completeModal = document.getElementById('complete-modal');
+    const modalRealInput = document.getElementById('modal-real');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    const modalSubmitBtn = document.getElementById('modal-submit-btn');
+
+    // 統計の要素
+    const totalTasksSpan = document.getElementById('total-tasks');
+    const progressRateSpan = document.getElementById('progress-rate');
+    const completionRateSpan = document.getElementById('completion-rate');
+    const avgErrorSpan = document.getElementById('avg-error');
+
+    // データ管理要素
+    const exportBtn = document.getElementById('export-btn');
+    const importBtn = document.getElementById('import-btn');
+    const clearAllBtn = document.getElementById('clear-all-btn');
+
+    // 初期化
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTasks();
+      updateStats();
+    });
+
+    function saveToLocalStorage() {
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+      updateStats();
+    }
+
+    function updateStats() {
+      const total = tasks.length;
+      totalTasksSpan.textContent = total;
+
+      if (total === 0) {
+        progressRateSpan.textContent = "0%";
+        completionRateSpan.textContent = "0%";
+        avgErrorSpan.textContent = "-";
+        return;
+      }
+
+      const inProgress = tasks.filter(t => t.status === 'progress' || t.status === 'completed').length;
+      const completedTasks = tasks.filter(t => t.status === 'completed');
+      const completedCount = completedTasks.length;
+
+      progressRateSpan.textContent = `${Math.round((inProgress / total) * 100)}%`;
+      completionRateSpan.textContent = `${Math.round((completedCount / total) * 100)}%`;
+
+      if (completedCount === 0) {
+        avgErrorSpan.textContent = "-";
+      } else {
+        let totalError = 0;
+        completedTasks.forEach(t => {
+          totalError += Math.abs(t.real - t.est);
+        });
+        const avg = Math.round(totalError / completedCount);
+        avgErrorSpan.textContent = `${avg}分`;
+      }
+    }
+
+    addTaskBtn.addEventListener('click', () => {
+      const title = taskTitleInput.value.trim();
+      const est = parseInt(taskEstInput.value, 10);
+
+      if (!title) {
+        alert('タスク名を入力してください。');
+        return;
+      }
+      if (!est || est <= 0) {
+        alert('正しい見積もり時間を入力してください。');
+        return;
+      }
+
+      tasks.push({
+        title,
+        est,
+        real: null,
+        status: 'todo'
+      });
+
+      taskTitleInput.value = '';
+      taskEstInput.value = '';
+      saveToLocalStorage();
+      renderTasks();
+    });
+
+    function renderTasks() {
+      taskList.innerHTML = '';
+
+      if (tasks.length === 0) {
+        taskList.innerHTML = `
+          <div class="text-center py-8 text-slate-400 text-xs">
+            <i class="fa-regular fa-clipboard text-2xl mb-2 block"></i>
+            タスクが登録されていません
+          </div>
+        `;
+        return;
+      }
+
+      tasks.forEach((task, index) => {
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-2xl border transition-all ${
+          task.status === 'completed' 
+            ? 'bg-slate-100/60 border-slate-100 text-slate-400' 
+            : 'bg-white border-slate-100 shadow-sm'
+        }`;
+
+        let badge = '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">未着手</span>';
+        let actionButton = `
+          <button onclick="startTask(${index})" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-xl text-xs transition-all">
+            <i class="fa-solid fa-play mr-1 text-slate-400"></i> 着手
+          </button>
+        `;
+
+        if (task.status === 'progress') {
+          badge = '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">進行中</span>';
+          actionButton = `
+            <button onclick="openCompleteModal(${index})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs transition-all shadow-md shadow-blue-600/15">
+              <i class="fa-solid fa-check mr-1"></i> 完了
+            </button>
+          `;
+        } else if (task.status === 'completed') {
+          badge = '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">完了</span>';
+          const error = task.real - task.est;
+          const errorText = error === 0 
+            ? "ピッタリ！" 
+            : error > 0 ? `＋${error}分超過` : `－${Math.abs(error)}分短縮`;
+          
+          actionButton = `
+            <div class="text-[11px] text-slate-400 flex items-center gap-1.5 font-medium">
+              <span>実績: <strong>${task.real}分</strong></span>
+              <span class="text-slate-300">|</span>
+              <span class="${error > 0 ? 'text-amber-500 font-bold' : 'text-emerald-500 font-bold'}">${errorText}</span>
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                ${badge}
+                <span class="text-xs text-slate-400 font-medium">見積: <strong>${task.est}分</strong></span>
+              </div>
+              <p class="font-bold text-sm ${task.status === 'completed' ? 'line-through text-slate-400' : 'text-slate-800'}">${task.title}</p>
+            </div>
+            <button onclick="deleteTask(${index})" class="text-slate-300 hover:text-rose-500 p-1 transition-all">
+              <i class="fa-regular fa-trash-can text-sm"></i>
+            </button>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between">
+            ${actionButton}
+          </div>
+        `;
+
+        taskList.appendChild(card);
+      });
+    }
+
+    window.startTask = function(index) {
+      tasks[index].status = 'progress';
+      saveToLocalStorage();
+      renderTasks();
+    };
+
+    window.openCompleteModal = function(index) {
+      activeTaskIndex = index;
+      modalRealInput.value = tasks[index].est;
+      completeModal.classList.remove('hidden');
+      modalRealInput.focus();
+    };
+
+    modalCancelBtn.addEventListener('click', () => {
+      completeModal.classList.add('hidden');
+      activeTaskIndex = null;
+    });
+
+    modalSubmitBtn.addEventListener('click', () => {
+      const real = parseInt(modalRealInput.value, 10);
+      if (!real || real <= 0) {
+        alert('実績時間を正しく入力してください。');
+        return;
+      }
+
+      if (activeTaskIndex !== null) {
+        tasks[activeTaskIndex].real = real;
+        tasks[activeTaskIndex].status = 'completed';
+        saveToLocalStorage();
+        renderTasks();
+        completeModal.classList.add('hidden');
+        activeTaskIndex = null;
+      }
+    });
+
+    window.deleteTask = function(index) {
+      if (confirm('このタスクを削除しますか？')) {
+        tasks.splice(index, 1);
+        saveToLocalStorage();
+        renderTasks();
+      }
+    };
+
+    exportBtn.addEventListener('click', () => {
+      if (tasks.length === 0) {
+        alert('保存するデータがありません。');
+        return;
+      }
+      const dataStr = JSON.stringify(tasks, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `task_backup_${new Date().toISOString().slice(0,10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    importBtn.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = e => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = event => {
+          try {
+            const importedTasks = JSON.parse(event.target.result);
+            if (Array.isArray(importedTasks)) {
+              if (confirm('既存のタスクデータを上書きしてバックアップを復元しますか？')) {
+                tasks = importedTasks;
+                saveToLocalStorage();
+                renderTasks();
+                alert('復元が成功しました！');
+              }
+            } else {
+              alert('不正なバックアップ形式ファイルです。');
+            }
+          } catch (err) {
+            alert('ファイルの読み込みに失敗しました。');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    });
+
+    clearAllBtn.addEventListener('click', () => {
+      if (confirm('これまでのすべてのデータ（タスク履歴、統計情報）が完全に削除されます。よろしいですか？')) {
+        tasks = [];
+        saveToLocalStorage();
+        renderTasks();
+        alert('すべてのデータをリセットしました。');
+      }
+    });
+
     // Service Workerの登録
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
